@@ -1,0 +1,57 @@
+:root
+{
+    --bg-dark: #171732;
+    --bg-color: #1b1b36;
+    --bg-light: #2b2b56;
+
+    --text-color: #DDDDDD;
+
+    --default-font: "Merriweather", serif;
+}
+
+body{
+    background-color: var(--bg-color);
+
+    color: var(--text-color);
+    font-family: var(--default-font);
+}
+
+input, button{
+    border: 3px solid var(--bg-light);
+    background-color: var(--bg-dark);
+
+    padding: 6px;
+    border-radius: 5px;
+    margin: 4px;
+
+    color: var(--text-color);
+    font-family: var(--default-font);
+
+    transition-duration: 0.2s;
+}
+
+input:hover, button:hover
+{
+    background-color: #1e1e39;
+}
+
+#selection_menu
+{
+    background-color: var(--bg-dark);
+    margin-left: -7px;
+    margin-top: -7px;
+
+    width: calc(100% + 14px);
+
+    height: 50px;
+}
+
+#selection_menu > button
+{
+    border: none;
+    height: 100%;
+
+    border-radius: 0;
+    margin: 0px;
+
+}
