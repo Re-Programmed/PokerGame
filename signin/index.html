@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Index Fund - Make Account</title>
+    <title>Stock Index Fund - Sign In</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,18 +15,22 @@
 <body>
     <script src="../jquery-3.7.1.min.js"></script>
     <script src="../data.js"></script>
+    <script src="../main.js"></script>
     <script src="./signin.js"></script>
 
     <div id="selection_menu">
-        <button>Sign In</button>
-        <button>My Account</button>
+        <button id="sign_in_button" enabled="false">Sign In</button>
+        <button id="acc_button">My Account</button>
+        <button id="ral_button">Rooms & Leaderboard</button>
     </div>
 
-    <div id="signin_box">
+    <div id="signin_box" autocomplete="false" autocapitalize="false" aria-autocomplete="false">
         <h1>Sign In</h1>
-        <input id="signin_username">
-        <input id="signin_passcode">
-        <button id="signin_button" onclick="SignIn($('#signin_username').val(), $('#signin_passcode').val())">Sign In</button><button id="signin_createaccount">Create Account</button> 
+        <div id="signin_inputs">
+            <input id="signin_username" placeholder="Username">
+            <input id="signin_passcode" placeholder="Passcode" type="password">
+        </div>
+        <button id="signin_button" onclick="SignIn($('#signin_username').val(), $('#signin_passcode').val())">Sign In</button> <button id="signin_createaccount" onclick="window.open('../create_account/index.html', '_self')">Create Account</button> 
     </div>
 </body>
 </html>

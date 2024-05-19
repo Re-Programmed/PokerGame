@@ -10,10 +10,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../style.css"></link>
+    <link rel="stylesheet" href="./home.css"></link>
 </head>
 <body>
     <script src="../jquery-3.7.1.min.js"></script>
     <script src="../data.js"></script>
+    <script src="../main.js"></script>
     <script src="./home.js"></script>
+
+    <div id="selection_menu">
+        <button id="sign_in_button">Sign In</button>
+        <button id="acc_button" enabled="false">My Account</button>
+        <button id="ral_button">Rooms & Leaderboard</button>
+    </div>
+
+    <div id="account_display">
+        <img id="user_icon">
+        <h1 id="user_username"></h1>
+    </div>
 </body>
 </html>
