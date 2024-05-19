@@ -16,14 +16,17 @@ const API = {
     },
 
     SendItem: async function(id, data) {
-        fetch('https://3c60tmkszb.execute-api.us-west-2.amazonaws.com/default/updatechat?table=PokerGame&id=' + id + "&data=" + data);
+        const a = await fetch('https://3c60tmkszb.execute-api.us-west-2.amazonaws.com/default/updatechat?table=PokerGame&id=' + id + "&data=" + data);
+        return a;
     },
 
     GetUser: async function (encodedUsername)
     {
         var data = await this.GetItem("user_" + encodedUsername);
+        if(data == null){return null;}
         const u = JSON.parse(atob(data.data));
         u.username = encodedUsername;
+        u.passcode = btoa(btoa(btoa(u.passcode)));
         return u;
     },
 
@@ -32,7 +35,87 @@ const API = {
         var user = JSON.parse(JSON.stringify(newUser));
         delete user.username;
 
-        this.SendItem("user_" + newUser.username, btoa(JSON.stringify(user)));
+        user.passcode = atob(atob(atob(user.passcode)));
+
+        const a = await this.SendItem("user_" + newUser.username, btoa(JSON.stringify(user)));
+        return a;
+    },
+
+    ScanAttempts: 0,
+    GetAllUsers: async function ()
+    {
+        ScanAttempts = 0;
+
+        const data = await fetch('https://tjdzerjw9f.execute-api.us-west-2.amazonaws.com/default?table=PokerGame');
+
+        const u = await data.json();
+
+        if(u == null || u == "null" || u == undefined)
+        {
+            if(this.ScanAttempts > 10){ return null; }
+            this.ScanAttempts++;
+            return await this.GetAllUsers();
+        }
+
+        var userArray = []
+        for(var i = 0; i < u.Count; i++)
+        {
+            var item = u.Items[i];
+            if(item.id.startsWith("user_"))
+            {
+                const u = JSON.parse(atob(item.data));
+                u.username = item.id.replace("user_", "");
+                delete u.passcode;
+                userArray.push(u);
+            }
+        }
+
+        return userArray;
+    },
+
+    GetAllRooms: async function () {
+        this.ScanAttempts = 0;
+
+        const data = await fetch('https://tjdzerjw9f.execute-api.us-west-2.amazonaws.com/default?table=PokerGame');
+
+        const u = await data.json();
+
+        if(u == null || u == "null" || u == undefined)
+        {
+            if(this.ScanAttempts > 10){ return null; }
+            this.ScanAttempts++;
+            return await this.GetAllRooms();
+        }
+
+        var roomArray = []
+        for(var i = 0; i < u.Count; i++)
+        {
+            var item = u.Items[i];
+            if(item.id.startsWith("room_"))
+            {
+                const u = JSON.parse(atob(item.data));
+                u.room_name = item.id.replace("room_", "");
+                delete u.code;
+                roomArray.push(u);
+            }
+        }
+
+        return roomArray;
+    },
+
+    UpdateRoom: async function (newRoom) {
+        var room = JSON.parse(JSON.stringify(newRoom));
+        delete room.room_name;
+
+        const a = await this.SendItem("room_" + newRoom.room_name, btoa(JSON.stringify(room)));
+        return a;
+    },
+
+    GetLeaderboard: async function () {
+        const data = await this.GetItem("leaderboard");
+        if(data == null){return null;}
+        const u = JSON.parse(atob(data.data));
+        return u;
     }
 }
 
