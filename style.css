@@ -76,3 +76,46 @@ button:focus, input:focus
     margin: 0px;
 
 }
+
+img
+{
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+
+}
+
+@keyframes Tooltip_Create {
+    from { background-color: #1d614000; border: 3px solid #29331d00; color: #DDDDDD00; }
+    to {}
+}
+
+.tooltip
+{
+    position: fixed;
+    
+    width: 150px;
+    height: 75px;
+
+    margin: 0;
+
+    background-color: #1d6140CC;
+    border: 3px solid #29331d77;
+
+    text-align: center;
+    padding: 5px;
+
+    animation-name: Tooltip_Create;
+    animation-duration: 0.25s;
+}
+
+@keyframes Tooltip_Remove {
+    from {}
+    to { background-color: #1d614000; border: 3px solid #29331d00; color: #DDDDDD00; }
+}
+
+.tooltip_removed
+{
+    animation-name: Tooltip_Remove;
+    animation-duration: 0.25s;
+}

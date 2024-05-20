@@ -5,6 +5,16 @@ const LocalStorage = {
 
     SetCurrentAccount: function (current_account) {
         return localStorage.setItem('pokerapp_081924801948_current_account', JSON.stringify(current_account));
+    },
+
+    UpdateRoomLocalData: function (rd)
+    {
+        localStorage.setItem("pokerapp_081924801948_current_room", JSON.stringify(rd));
+    },
+
+    RetrieveRoomLocalData: function ()
+    {
+        return JSON.parse(localStorage.getItem("pokerapp_081924801948_current_room"));
     }
 }
 
@@ -116,6 +126,15 @@ const API = {
         if(data == null){return null;}
         const u = JSON.parse(atob(data.data));
         return u;
+    },
+
+    GetRoom_TEST: async function ()
+    {
+        return await FAKE_SERVER;
+    },
+    SetRoom_TEST: async function (room)
+    {
+        FAKE_SERVER = room;
     }
 }
 
@@ -130,4 +149,16 @@ function GetURLParam(param)
     }
 
     return urlParams.get(param);
+}
+
+var FAKE_SERVER = {players:["Will", "Joe"],code:"",game:"poker",theme:"ptg",
+    CurrentTurn: 1,
+    CurrentBlind: 1,
+    CurrentBet: 5,
+    CurrentStage: 0,
+    QueuedBets: [
+
+    ],
+    Creator: "Will",
+    MinimumBet: 5
 }
