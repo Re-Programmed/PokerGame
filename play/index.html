@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Index Fund - Play</title>
 
+    <link rel="icon" href="../assets/logo_dark.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
@@ -16,7 +22,10 @@
     <script src="../jquery-3.7.1.min.js"></script>
     <script src="../data.js"></script>
     <script src="../main.js"></script>
-    <script src="./play.js"></script>
+    <script src="../card_data.js"></script>
+    <script src="../tooltip_manager.js"></script>
+    <script src="./play_utils.js"></script>
+    <script src="./play_texas_hold_em.js"></script>
 
     <div id="selection_menu">
         <button id="sign_in_button">Sign In</button>
@@ -24,6 +33,64 @@
         <button id="ral_button">Rooms & Leaderboard</button>
     </div>
 
+    <div id="bet_display" style="background-color: #00000000; border: 3px solid #00000000;">
+        <p id="bet_display_info" style="color: #DDDDDD00;">Current Bet: 5<br><br>Pot: 15</p>
+    </div>
+
+    <div id="pot" class="no_interpolation">
+
+    </div>
+
+    <div id="deck">
+        
+    </div>
+
+    <div id="hand">
+
+    </div>
+
+    <div id="player_1_display" class="player_display_hidden">
+
+    </div>
+    <div id="player_2_display" class="player_display_hidden">
+
+    </div>
+    <div id="player_3_display" class="player_display_hidden">
+
+    </div>
+
+    <div id="player_4_display" class="player_display_hidden">
+
+    </div>
+
+    <div id="chips">
+        <div id="chip_counter">
+            <div id="chip_1_display" class="chip_display">
+
+            </div>
+            <div id="chip_2_display" class="chip_display">
+                
+            </div>
+            <div id="chip_3_display" class="chip_display">
+                
+            </div>
+            <div id="chip_4_display" class="chip_display">
+                
+            </div>
+            <div id="chip_5_display" class="chip_display" style="border: none !important;">
+                
+            </div>
+        </div>
+        <div id="button_game_options">
+            <button id="fold_button">Fold</button>
+            <button id="check_button">Match</button>
+            <button id="raise_button">Next Turn / Check</button>
+        </div>
+    </div>
    
+    <div id="turn_details">
+        <h1 id="turn_details_info">0</h1>
+    </div>
+
 </body>
 </html>
