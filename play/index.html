@@ -63,6 +63,8 @@
 
     </div>
 
+    <div id="public_cards_display"></div>
+
     <div id="chips">
         <div id="chip_counter">
             <div id="chip_1_display" class="chip_display">
@@ -83,9 +85,13 @@
         </div>
         <div id="button_game_options">
             <button id="fold_button">Fold</button>
-            <button id="check_button">Match</button>
-            <button id="raise_button">Next Turn / Check</button>
+            <button id="check_button" onclick="Match()">Match</button>
+            <button id="raise_button" onclick="NextTurn()">Next Turn / Check</button>
         </div>
+        <div id="button_game_options_2">
+            <button id="all_in_button" onclick="AllIn()">All In</button>
+            <button id="event_display" onclick="">Draw Card</button>
+        </div>  
     </div>
    
     <div id="turn_details">

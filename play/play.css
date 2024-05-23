@@ -78,7 +78,7 @@ html, body {
     border: 3px solid var(--bg-dark);
     border-radius: 5px;
 
-    height: 180px;
+    height: 225px;
 
     margin-left: 17px;
 
@@ -88,7 +88,7 @@ html, body {
 
     position: fixed;
 
-    bottom: 80px;
+    bottom: 38px;
 }
 
 #chip_counter
@@ -133,7 +133,13 @@ html, body {
     transform: translateX(-24px);
 }
 
-#button_game_options
+#button_game_options_2
+{
+    height: 44px !important;
+    width: 100%;
+}
+
+#button_game_options, #button_game_options_2
 {
     display: flex;
     flex-direction: row;
@@ -149,7 +155,29 @@ html, body {
     width: 33%;
 }
 
-#fold_button, #check_button, #raise_button
+#button_game_options_2 > button
+{
+    width: 50%;
+}
+
+#event_display
+{
+    background-color: var(--bg-color);
+}
+
+#event_display:hover
+{
+    animation: none !important;
+    transform: none !important;
+}
+
+#event_display:focus
+{
+    transform: none !important;
+    border: 3px solid var(--bg-light) !important;
+}
+
+#fold_button, #check_button, #raise_button, #all_in_button
 {
     transition-duration: 0.25s;
 }
@@ -167,6 +195,11 @@ html, body {
 #raise_button:hover
 {
     background-color: #333366;
+}
+
+#all_in_button:hover
+{
+    background-color: #336666;
 }
 
 #pot
@@ -254,9 +287,9 @@ html, body {
 #player_2_display
 {
     top: 10%;
-    left: 50%;
+    right: 8%;
+    margin-right: 0;
 
-    transform: translateX(-50%);
 }
 
 #player_3_display
@@ -265,6 +298,32 @@ html, body {
     top: 30%;
 }
 
+
+#public_cards_display
+{
+    position: fixed;
+
+    top: 10%;
+    left: 8%;
+
+    width: 50%;
+    height: 13.5%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+@keyframes PublicCard_Spawn {
+    from {transform: scale(1.5); opacity: 0;}
+    to {}
+}
+
+#public_cards_display > img
+{
+    animation-name: PublicCard_Spawn;
+    animation-duration: 0.5s;
+}
 
 #player_4_display
 {

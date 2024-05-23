@@ -9,12 +9,12 @@ const LocalStorage = {
 
     UpdateRoomLocalData: function (rd)
     {
-        localStorage.setItem("pokerapp_081924801948_current_room", JSON.stringify(rd));
+        localStorage.setItem("pokerapp_081924801948_current_room_" + User.username, JSON.stringify(rd));
     },
 
     RetrieveRoomLocalData: function ()
     {
-        return JSON.parse(localStorage.getItem("pokerapp_081924801948_current_room"));
+        return JSON.parse(localStorage.getItem("pokerapp_081924801948_current_room_" + User.username));
     }
 }
 
@@ -121,6 +121,17 @@ const API = {
         return a;
     },
 
+    GetRoom: async function(roomId)
+    {
+        var data = await this.GetItem("room_" + roomId);
+        if(data == null){return null;}
+
+        const u = JSON.parse(atob(data.data));
+        u.room_name = roomId;
+        
+        return u;
+    },
+
     GetLeaderboard: async function () {
         const data = await this.GetItem("leaderboard");
         if(data == null){return null;}
@@ -152,13 +163,25 @@ function GetURLParam(param)
 }
 
 var FAKE_SERVER = {players:["Will", "Joe"],code:"",game:"poker",theme:"ptg",
+    room_name: "Cool Room",
     CurrentTurn: 1,
     CurrentBlind: 1,
     CurrentBet: 5,
     CurrentStage: 0,
+    RoundsPlayed: 0,
     QueuedBets: [
 
     ],
+    AllIn: [
+
+    ],
     Creator: "Will",
-    MinimumBet: 5
+    MinimumBet: 5,
+    PlayerCards: [
+        {c1: null, c2: null},
+        {c1: null, c2: null},
+        {c1: null, c2: null},
+        {c1: null, c2: null}
+    ],
+    Folded: []
 }
