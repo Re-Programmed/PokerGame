@@ -100,12 +100,12 @@ function RenderDeck(deckParent)
 
 //Renders a card as a child of the given element query.
 //cardParent: string, card: Card
-function RenderCard(cardParent, card)
+function RenderCard(cardParent, card, scale = 1)
 {
     const cardobj = document.createElement("img");
     cardobj.src = "../assets/cards/" + card.GetImage();
-    cardobj.width = "140";
-    cardobj.height = "200";
+    cardobj.width = 140 * scale;
+    cardobj.height = 200 * scale;
     cardobj.classList = "no_interpolation card_render"
 
     AddTooltipElement(cardobj, `<h4>${card.Value + " of " + card.Suit}`)

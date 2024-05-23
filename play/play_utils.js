@@ -1,5 +1,6 @@
 var ChipCount = [0, 0, 0, 0, 0]
 
+var CurrentPotChips = []
 
 var ChipValues = [
     1,
@@ -53,7 +54,7 @@ function CreatePlayerDisplay(playerNumber, user)
         ht = PLAYER_HTML_ATTRIBS + ht;
     }
 
-    ht = ht.replace("%icon%", atob(user.icon)).replace(/%username%/g, user.username).replace(/%chips%/g, "").replace(/%p%/g, playerNumber);
+    ht = ht.replace("%icon%", atob(user.icon)).replace(/%username%/g, user.username).replace(/%chips%/g, user.chips).replace(/%p%/g, playerNumber);
 
     $(`#player_${playerNumber}_display`).html(ht).attr("class", "player_display");
 }
@@ -301,12 +302,26 @@ function AddPlayerAttrib(player, attrib)
     $(`#${player}_attribs`).append(newAtt);
 }
 
+function ClearAllPlayerAttribs()
+{
+    for(var v = 1; v <= 4; v++)
+    {
+        if(document.getElementById(`${v}_attribs`) == null){continue;}
+        document.getElementById(`${v}_attribs`).innerHTML = "";
+    }
+}
+
 var PotValue = 0;
 var CurrentBet = 0;
 
 //Add a chip object to the pot in the middle.
-function AddChipToPotDisplay(chipValue)
+function AddChipToPotDisplay(chipValue, dontUpdatePotChips = false)
 {
+    if(!dontUpdatePotChips)
+    {
+        CurrentPotChips.push(chipValue);
+    }
+
     PotValue += ChipValues[chipValue - 1];
 
     var x = (Math.random() * 180);
@@ -332,6 +347,9 @@ var UpsetOfCurrent = 0
 //Adds a chip object to the pot in the middle AND REMOVES IT FROM THE SUPPLY.
 function AddChipToPot(chipValue, ignoreRemoval = false)
 {
+    if(!IsMyTurn()){return;}
+    if(checkingBets && GameData.CurrentBet < CurrentBet + ChipValues[chipValue - 1]){ return; }
+
     UpsetOfCurrent += ChipValues[chipValue - 1];
 
     if(UpsetOfCurrent > 0)
@@ -356,4 +374,199 @@ function AddChipToPot(chipValue, ignoreRemoval = false)
     }
 
     QueuedBets.push(chipValue);
+}
+
+//Saves variables related to losing connection or reloading the page that should remain consistent.
+function SaveLocalGameState()
+{
+    const LocalGameData = {
+        QueuedBets: QueuedBets,
+        WasMyTurn: WasMyTurn,
+        UpsetOfCurrent: UpsetOfCurrent,
+        RoomName: GameData.room_name,
+        LastRoomRound: GameData.RoundsPlayed,
+        LastRoomEvent: GameData.CurrentStage,
+        MyCards: MyCards,
+        ChipCount: ChipCount,
+        CurrentBet: CurrentBet,
+        CurrentPotChips: CurrentPotChips,
+        checkingBets: checkingBets,
+        Folded: Folded
+    }
+
+    LocalStorage.UpdateRoomLocalData(LocalGameData);
+}
+
+function CheckIsValidRoomLocalData()
+{
+    const LocalGameData = LocalStorage.RetrieveRoomLocalData();
+    if(LocalGameData.RoomName != current_room || LocalGameData.LastRoomRound != GameData.RoundsPlayed || LocalGameData.LastRoomEvent != GameData.CurrentStage)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+//Loads variables related to losing connection or reloading the page that should remain consistent.
+//Returns false if the room loaded is different to the room that the user was previously in.
+function LoadLocalGameState(current_room)
+{
+    console.log("LAODDING GAME")
+
+    const LocalGameData = LocalStorage.RetrieveRoomLocalData();
+
+    console.log(LocalGameData);
+
+    if(LocalGameData == null || LocalGameData == undefined){return false;}
+
+    //Check if the data saved pertains to this room.
+    if(LocalGameData.RoomName != current_room)
+    {
+        return false;
+    }
+
+    //Set chip amounts to what they were before the reload.
+    for(var v = 0; v < LocalGameData.ChipCount.length; v++)
+    {
+        for(var amnt = 0; amnt < LocalGameData.ChipCount[v]; amnt++)
+        {
+            AddChipToSupply(v + 1);
+        }
+    }
+
+    //Change poker hand to match what it was before the reload.
+    DrawCardsToHand(LocalGameData.MyCards);
+
+    //Check if BeginTurn() has already called.
+    WasMyTurn = LocalGameData.WasMyTurn;
+    UpsetOfCurrent = LocalGameData.UpsetOfCurrent;
+
+    Folded = LocalGameData.Folded;
+
+    checkingBets = LocalGameData.checkingBets;
+    
+     //Update the text showing how much under or over the current bet you are.
+     if(UpsetOfCurrent > 0)
+    {
+        $("#turn_details_info").css("color", "lightgreen");
+    }else if(UpsetOfCurrent == 0)
+    {
+        $("#turn_details_info").css("color", "lightblue");
+    }else{
+        $("#turn_details_info").css("color", "red");
+    }
+
+    $("#turn_details_info").text(UpsetOfCurrent > 0 ? (`+${UpsetOfCurrent}`) : (UpsetOfCurrent == 0 ? "0" : `${UpsetOfCurrent}`))
+
+    //Update what bets have been made.
+    QueuedBets = LocalGameData.QueuedBets;
+    CurrentPotChips = LocalGameData.CurrentPotChips;
+    for(var b = 0; b < CurrentPotChips.length; b++)
+    {
+        AddChipToPotDisplay(CurrentPotChips[b], true);
+    }
+
+    //Update what the current bet is.
+    CurrentBet = LocalGameData.CurrentBet;
+
+    return true;
+}
+
+//Clears persistent data from games. Should be called when joining a new poker game.
+function ClearLocalGameState()
+{
+    const LocalGameData = {
+        QueuedBets: [],
+        WasMyTurn: false,
+        UpsetOfCurrent: 0,
+        RoomName: "New Room",
+        MyCards: [],
+        ChipCount: [0, 0, 0, 0, 0],
+        CurrentBet: 5,
+        CurrentPotChips: [],
+        Folded: false
+    }
+
+    LocalStorage.UpdateRoomLocalData(LocalGameData);
+}
+
+var CurrentConfirmMenu = null;
+
+function CreateConfirmationMenu(message, okCallback)
+{
+    if(CurrentConfirmMenu != null){CurrentConfirmMenu.remove();}
+
+    const menu = document.createElement("div");
+    menu.style = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--bg-color);
+        border: 3px solid var(--bg-dark);
+        border-radius: 5px;
+        padding: 7px;
+        text-align: center;
+    `
+
+    menu.innerHTML = `<h2>${message}</h2>`;
+
+    const okButton = document.createElement("button");
+    const cancelButton = document.createElement("button");
+    okButton.textContent = "Continue";
+    cancelButton.textContent = "Cancel";
+
+    const okBack = okCallback;
+    okButton.addEventListener('click', function () {
+        if(CurrentConfirmMenu != null){CurrentConfirmMenu.remove();}
+
+        okBack();
+    });
+    cancelButton.addEventListener('click', function () {
+        if(CurrentConfirmMenu != null){CurrentConfirmMenu.remove();}
+    })
+
+    menu.appendChild(okButton);
+    menu.appendChild(cancelButton);
+
+    document.body.appendChild(menu)
+
+    CurrentConfirmMenu = menu;
+}
+
+//Creates text that scrolls up the screen.
+function CreateScrollText(value, color = "#DDDDDD")
+{
+    const scrollText = document.createElement("div");
+    scrollText.style = `
+        position: fixed;
+        top: 100%;
+        left: 50%;
+        transform: translate(-50%, 0);
+        padding: 7px;
+        text-align: center;
+    `
+
+    scrollText.innerHTML = `<h1 style="color: ${color};">${value}</h1>`
+    
+    document.body.appendChild(scrollText);
+
+    const fadeInt = setInterval(function () {
+        scrollText.style.top = (scrollText.style.top.replace("%", "") - 0.1) + "%"; 
+
+        if(parseFloat(scrollText.style.top.replace("%", "")) > 50)
+        {
+            scrollText.style.color = "#DDDDDDFF";
+        }else{
+            const value = parseInt((100 * ((scrollText.style.top.replace("%", "") + 50)/50)));
+            scrollText.style.color = "#DDDDDD" + value;
+
+            if(parseFloat(scrollText.style.top.replace("%", "")) < -50)
+            {
+                scrollText.remove();
+                clearInterval(fadeInt);
+            }
+        }
+    }, 1)
 }
