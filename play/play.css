@@ -477,3 +477,32 @@ html, body {
     animation-name: Card_Create;
     animation-duration: 0.25s;
 }
+
+@keyframes show_card_back_flip {
+    from{ transform: scaleX(0); filter: drop-shadow(3px 100x 3px #00000033); }
+    to{ transform: scaleX(-1); filter: drop-shadow(3px 200px 3px #00000033); }
+}
+.show_card_back
+{
+    animation-name: show_card_back_flip;
+    animation-duration: 0.3s;
+
+    animation-fill-mode: forwards;
+}
+
+.player_cards_display
+{
+    display: inline;
+    position: relative;
+
+}
+
+.player_cards_display>img
+{
+    transition-duration: 0.3s;
+}
+
+.player_cards_display>img:hover
+{
+    transform: translateY(-8px);
+}

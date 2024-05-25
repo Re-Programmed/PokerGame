@@ -1,5 +1,10 @@
 //EMPTY ROOM
-//eyJwbGF5ZXJzIjpbIldpbGwiLCJKb2UiXSwiY29kZSI6IiIsImdhbWUiOiJwb2tlciIsInRoZW1lIjoicHRnIiwiQ3VycmVudFR1cm4iOjEsIkN1cnJlbnRCbGluZCI6MSwiQ3VycmVudEJldCI6NSwiQ3VycmVudFN0YWdlIjowLCJSb3VuZHNQbGF5ZWQiOjAsIlF1ZXVlZEJldHMiOltdLCJBbGxJbiI6W10sIkNyZWF0b3IiOiJXaWxsIiwiTWluaW11bUJldCI6NSwiUGxheWVyQ2FyZHMiOlt7ImMxIjpudWxsLCJjMiI6bnVsbH0seyJjMSI6bnVsbCwiYzIiOm51bGx9LHsiYzEiOm51bGwsImMyIjpudWxsfSx7ImMxIjpudWxsLCJjMiI6bnVsbH1dLCJGb2xkZWQiOltdLCJQb3QiOiAwLCAiUGxheWVyQmV0cyI6IFswLCAwLCAwLCAwXSwiQ2hlY2tpbmdCZXRzIjogW119=====
+//eyJwbGF5ZXJzIjpbIldpbGwiLCJKb2UiXSwiY29kZSI6IiIsImdhbWUiOiJwb2tlciIsInRoZW1lIjoicHRnIiwiQ3VycmVudFR1cm4iOjEsIkN1cnJlbnRCbGluZCI6MSwiQ3VycmVudEJldCI6NSwiQ3VycmVudFN0YWdlIjowLCJSb3VuZHNQbGF5ZWQiOjAsIlF1ZXVlZEJldHMiOltdLCJBbGxJbiI6W10sIkNyZWF0b3IiOiJXaWxsIiwiTWluaW11bUJldCI6NSwiUGxheWVyQ2FyZHMiOlt7ImMxIjpudWxsLCJjMiI6bnVsbH0seyJjMSI6bnVsbCwiYzIiOm51bGx9LHsiYzEiOm51bGwsImMyIjpudWxsfSx7ImMxIjpudWxsLCJjMiI6bnVsbH1dLCJGb2xkZWQiOltdLCJQb3QiOiAwLCAiUGxheWVyQmV0cyI6IFswLCAwLCAwLCAwXSwiQ2hlY2tpbmdCZXRzIjogW10sICJQdWJsaWNDYXJkcyI6WyIiLCIiLCIiLCIiLCIiXSwiU2hvd2luZ0NhcmRzIjotMX0=
+
+//TODO:
+    //SOMETIMES ON ENDING YOUR TURN, THE POT WILL RANDOMLY GET CHIPS ADDED TO IT.
+    //Show player cards not working for some reason.
+    //Add final hand check and winner gets the pot.
 
 var GameData = {
     CurrentTurn: 0
@@ -138,9 +143,12 @@ function SetCurrentPlayer(playerNum)
 {
     if(IsMyTurn())
     {
-       document.getElementById("fold_button").removeAttribute("disabled");
-       document.getElementById("check_button").removeAttribute("disabled");
-       document.getElementById("raise_button").removeAttribute("disabled");
+        if(!showingCards)
+        {
+            document.getElementById("fold_button").removeAttribute("disabled");
+            document.getElementById("check_button").removeAttribute("disabled");
+            document.getElementById("raise_button").removeAttribute("disabled");
+        }
 
        $("#player_4_display").attr("style", "border: 3px solid #796600; transform: scale(1.05);")
 
@@ -150,9 +158,12 @@ function SetCurrentPlayer(playerNum)
        }
     }else{
         $("#player_4_display").attr("style", "")
-        document.getElementById("fold_button").setAttribute("disabled", "true");
-        document.getElementById("check_button").setAttribute("disabled", "true");
-        document.getElementById("raise_button").setAttribute("disabled", "true");
+        if(!showingCards)
+        {
+            document.getElementById("fold_button").setAttribute("disabled", "true");
+            document.getElementById("check_button").setAttribute("disabled", "true");
+            document.getElementById("raise_button").setAttribute("disabled", "true");
+        }
 
         var i = 1;
         for(var v = 1; v <= GameData.players.length; v++)
@@ -208,6 +219,8 @@ function Update(ignoreState = false, forceAPI = false)
     }
 }
 
+var lastStage = 0, lastShownCards = -1;
+
 function performUpdate(room, iS)
 {
     //ASSIGN PLAYER ID TO WHAT POSITION IN THE ARRAY OF PLAYERS THEY ARE AT.
@@ -233,6 +246,18 @@ function performUpdate(room, iS)
         ClientData.Players.push({ username: "" });
     }
 
+    for(var v = 1; v < 4; v++)
+    {
+        if($(`#player_${v}_display`).html() != " ")
+        {
+            if(v >= ClientData.Players.length)
+            {
+                $(`#player_${v}_display`).html(" ")
+            }
+            
+        }
+    }
+
     //Removes players that left.
     var i = 4;
     while(GameData.players.length < ClientData.Players.length && i > 0)
@@ -251,33 +276,33 @@ function performUpdate(room, iS)
         i--;
     }
     
+    while(lastStage < GameData.CurrentStage)
+    {
+        lastStage++;
+
+        switch(lastStage)
+        {
+            //The flop needs to be rendered.
+            case 1:
+                for(var i = 0; i < 3; i++)
+                {
+                    const c = new Card(GameData.PublicCards[i].split("_")[0], GameData.PublicCards[i].split("_")[1])
+                    setTimeout(function () {
+                        RenderCard("#public_cards_display", c, 0.65);
+                    }, v * 500)
+                }
+                break;
+            //The turn or river should be rendered.
+            case 2:
+            case 3:
+                const c = new Card(GameData.PublicCards[lastStage + 1].split("_")[0], GameData.PublicCards[lastStage + 1].split("_")[1])
+                RenderCard("#public_cards_display", c, 0.65);
+                break;
+        }
+    }
     
     //Updates players if a player joined in place of another.
-    var i = 1;
-    for(var p = 0; p < GameData.players.length; p++)
-    {
-        console.log("CHECKING: " + GameData.players[p])
-        if(GameData.players[p] == User.username)
-        {
-            ClientData.PlayerNum = p + 1;
-            ClientData.Players[p] = User;
-
-            continue;
-        }
-
-        if(GameData.players[p] != ClientData.Players[p].username)
-        {
-            console.log("PLAYER " + p + " IS NOT ME AND ")
-            const p2 = i;
-            API.GetUser(GameData.players[p]).then(user => {
-                ClientData.Players[p2] = user;
-                CreatePlayerDisplay(p2, user);
-                UpdatePlayerAttribs();
-            })
-        }
-
-        i++;
-    }
+    UpdateAllPlayers();
 
     if(!reload)
     {
@@ -302,6 +327,17 @@ function performUpdate(room, iS)
     if(!IsMyTurn())
     {
         WasMyTurn = false;
+    }
+
+    if(GameData.ShowingCards != -1)
+    {  
+        if(lastShownCards != GameData.ShowingCards)
+        {
+            ShowPlayerCards(GameData.ShowingCards);
+            lastShownCards = GameData.ShowingCards;
+        }
+    }else{
+        lastShownCards = -1;
     }
 
     var i = 1;
@@ -337,6 +373,34 @@ function performUpdate(room, iS)
     SaveLocalGameState();
 }
 
+function UpdateAllPlayers(refresh = false)
+{
+    var i = 1;
+    for(var p = 0; p < GameData.players.length; p++)
+    {
+        if(GameData.players[p] == User.username)
+        {
+            ClientData.PlayerNum = p + 1;
+            ClientData.Players[p] = User;
+
+            continue;
+        }
+
+        if(GameData.players[p] != ClientData.Players[p].username || refresh)
+        {
+            const p2 = p;
+            const i2 = i;
+            API.GetUser(GameData.players[p2]).then(user => {
+                ClientData.Players[p2] = user;
+                CreatePlayerDisplay(i2, user);
+                UpdatePlayerAttribs();
+            })
+        }
+        
+        i++;
+    }
+}
+
 var funcQueue = []
 function queue(v){funcQueue.push(v);}
 
@@ -346,7 +410,53 @@ function IsMyTurn()
     return GameData.CurrentTurn == ClientData.PlayerNum;
 }
 
+function ShowPlayerCards(player)
+{
+    if(player == ClientData.PlayerNum){return;}
 
+    player--;
+    //Find which display represents this player.
+    var playerDisplay = 0;
+    var i = 0;
+    for(var v = 0; v < ClientData.Players.length; v++)
+    {
+        if(v == player)
+        {
+            playerDisplay = i;
+        }
+
+        if(ClientData.PlayerNum != v){i++;}
+    }
+
+    console.error(playerDisplay)
+    
+    $(`#player_${playerDisplay}_cards`).attr("style", "transition-duration: 0.3s; opacity: 0;");
+    setTimeout(() => {
+        $(`#player_${playerDisplay}_cards`).attr("style", "transition-duration: 0.3s; opacity: 1; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(4);");
+        $(`#player_${playerDisplay}_cards>img`).attr("style", "margin: 6.5px;");
+
+        setTimeout(() => {
+            $(`#player_${playerDisplay}_cards>img`).attr("style", "transition-duration: 0.3s; transform: scaleX(0);");
+            setTimeout(() => {
+                const pCard = GameData.PlayerCards[player];
+                var card = new Card(pCard.c1.split("_")[0], pCard.c1.split("_")[1]);
+   
+                $(`#player_${playerDisplay}_cards>img:first-child`).attr("src", "../assets/cards/" + card.GetImage());
+                card = new Card(pCard.c2.split("_")[0], pCard.c2.split("_")[1]);
+                $(`#player_${playerDisplay}_cards>img:last-child`).attr("src", "../assets/cards/" + card.GetImage());
+                $(`#player_${playerDisplay}_cards>img`).attr("style", "transition-duration: 0.3s; transform: scaleX(1); margin: 6.5px;");
+                setTimeout(() => {
+                    $(`#player_${playerDisplay}_cards`).attr("style", "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(4); transition-duration: 0.3s; opacity: 0;");
+               
+                    setTimeout(() => {
+                        $(`#player_${playerDisplay}_cards`).attr("style", "transition-duration: 0.3s; opacity: 1;");              
+                        $(`#player_${playerDisplay}_cards>img`).attr("style", "");     
+                    }, 0.3 * 1000);
+                }, 2000);
+            }, 0.3 * 1000);
+        }, 0.6 * 1000);
+    }, 0.3 * 1000);
+}
 
 //QUEUE ONLY.
 function FinishTurn()
@@ -512,8 +622,8 @@ function FinishStage()
             case 3:
                 CreateTheRiver();
                 break;
-            default:
-                alert("GAME OVER")
+            case 4:
+                FinishGame_MAIN();
                 break;
         }
     }else{
@@ -526,12 +636,48 @@ function FinishStage()
 var reload = false;
 var checkingBets = false;
 
+function FinishGame_CLIENT()
+{
+    //Update all players money.
+    var i = 1;
+    for(var p = 0; p < GameData.players.length; p++)
+    {
+        if(GameData.players[p] == User.username)
+        {
+            ClientData.PlayerNum = p + 1;
+            ClientData.Players[p] = User;
+
+            continue;
+        }
+
+        if(GameData.players[p] != ClientData.Players[p].username)
+        {
+            console.log("PLAYER " + p + " IS NOT ME AND ")
+            const p2 = i;
+            API.GetUser(GameData.players[p]).then(user => {
+                ClientData.Players[p2] = user;
+                CreatePlayerDisplay(p2, user);
+                UpdatePlayerAttribs();
+            })
+        }
+
+        i++;
+    }
+}
+
+function FinishGame_MAIN()
+{
+
+
+}
+
+var showingCards = false;
+
 function BeginTurn()
 {
     Update(false, true);
     if(!IsMyTurn()){return;}
-    
-    console.log("BEGUN TURN")
+
     UpsetOfCurrent = -GameData.CurrentBet;
     CurrentBet = 0;
     QueuedBets = [];
@@ -545,7 +691,8 @@ function BeginTurn()
         UpsetOfCurrent = CurrentBet - GameData.CurrentBet;
     }
 
-    
+    //Update all players chip counts.
+    UpdateAllPlayers(true);
     
     //Update the text showing how much under or over the current bet you are.
     if(UpsetOfCurrent > 0)
@@ -579,7 +726,14 @@ function BeginTurn()
     //Save local game state on turn begin.
     SaveLocalGameState();
 
-    
+    GameData.QueuedBets = [];
+
+    //We are currently on the reveal hands stage.
+    if(GameData.CurrentStage == 4)
+    {
+        showingCards = true;
+    }
+
     //We are checking bets and have already matched the given bet. Skip turn.
     if((GameData.CheckingBets.length > 0 && !GameData.CheckingBets.includes(ClientData.PlayerNum)) || Folded || GameData.Folded.includes(ClientData.PlayerNum))
     {
@@ -644,8 +798,73 @@ function DeckClick()
     }
 }
 
+var storedButtonData = ''
+
+var showAnimPlaying = false;
+
+function ShowCards()
+{
+    if(showAnimPlaying){return;}
+
+    showAnimPlaying = true;
+    GameData.ShowingCards = ClientData.PlayerNum;
+    API.UpdateRoom(GameData).then(d => {
+        //Cards flipping up animation!
+        $("#hand").attr("style", "transition-duration: 0.6s; transform: translate(0, -100%);")
+        $("#hand>img").attr("style", "transition-duration: 0.6s; filter: drop-shadow(0px 200px 3px #00000033); transform: scaleX(-1);")
+
+        const ogCards = $("#hand").html();
+
+        setTimeout(function() {
+            $("#hand").html("<img src=\"../assets/cards/back.png\" width=\"140\" height=\"200\" class=\"show_card_back no_interpolation\"><img src=\"../assets/cards/back.png\" width=\"140\" height=\"200\" class=\"show_card_back no_interpolation\">")
+        
+            setTimeout(function() {
+                $("#hand").html(ogCards);
+                $("#hand>img").attr("style", "transition-duration: 0.6s; filter: drop-shadow(0px 200px 3px #00000033); transform: scaleX(1);")
+
+                setTimeout(function() {
+                    $("#hand").attr("style", "transition-duration: 0.6s;")
+                    $("#hand>img").attr("style", "transition-duration: 0.6s;")
+
+                    showAnimPlaying = false;
+
+                    //Finish turn.
+                    FinishTurn();
+                }, 2000)
+            }, 2050)
+        }, 1000 * 0.3)
+    })
+
+  
+}
+
 function UpdateButtons()
 {
+    if(showingCards && IsMyTurn())
+    {
+        if(storedButtonData == '')
+        {
+            storedButtonData = document.getElementById("button_game_options").innerHTML;
+
+            $("#button_game_options").html(`<button onclick="ShowCards()" id="show_cards_button">Show Cards</button>`);
+            $("#all_in_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
+            document.getElementById("all_in_button").setAttribute("disabled", "true");
+
+            $("#show_cards_button").attr("style", "width: 95%;");
+
+            $("#event_display").attr("style", "font-size: 0.95em;");
+            $("#event_display").text("Show cards.");
+        }
+        
+        
+        return;
+    }else if(storedButtonData != '')
+    {
+        document.getElementById("button_game_options").innerHTML = storedButtonData;
+        document.getElementById("all_in_button").setAttribute("disabled", "false");
+        storedButtonData = '';
+    }
+
     const tChipValue = GetTotalChipValue();
     if(!IsMyTurn() || tChipValue <= 0)
     {
@@ -734,7 +953,6 @@ function Match()
     {
         for(var amnt = 0; amnt < removal[c]; amnt++)
         {
-            console.log()
             AddChipToPot(c + 1, true);
         }
     }
@@ -782,33 +1000,70 @@ var CurrentPublicCards = ["", "", "", "", ""]
 function CreateTheFlop()
 {
     const cards = [DrawCard(), DrawCard(), DrawCard()]
-
+ 
     for(var v = 0; v < 3; v++)
     {
         GameData.PublicCards[v] = cards[v].Suit + "_" + cards[v].Value;
         CurrentPublicCards[v] = cards[v].Suit + "_" + cards[v].Value;
 
-        const myId = v;
-        setTimeout(function () {
-            RenderCard("#public_cards_display", cards[myId], 0.65);
-        }, v * 500)
+        //Ensure no player has the cards that were put into the flop.
+        for(var i = 0; i < 4; i++)
+        {
+            if(GameData.PlayerCards[i].c1 == GameData.PublicCards[v] || GameData.PlayerCards[i].c2 == GameData.PublicCards[v])
+            {
+                CreateTheFlop();
+                return;
+            }
+        }
+
+       // const myId = v;
+       // setTimeout(function () {
+       //     RenderCard("#public_cards_display", cards[myId], 0.65);
+      //  }, v * 500)
     }
 }
 
 function CreateTheTurn()
 {
+   // lastStage = 2;
     const card = DrawCard();
     GameData.PublicCards[3] = card.Suit + "_" + card.Value;
     CurrentPublicCards[3] = card.Suit + "_" + card.Value;
 
-    RenderCard("#public_cards_display", card, 0.65);
+    for(var i = 0; i < 4; i++)
+    {
+        if(GameData.PlayerCards[i].c1 == GameData.PublicCards[3] || GameData.PlayerCards[i].c2 == GameData.PublicCards[3])
+        {
+            CreateTheTurn();
+            return;
+        }
+    }
+
+   // RenderCard("#public_cards_display", card, 0.65);
 }
 
 function CreateTheRiver()
 {
+   // lastStage = 3;
     const card = DrawCard();
     GameData.PublicCards[4] = card.Suit + "_" + card.Value;
     CurrentPublicCards[4] = card.Suit + "_" + card.Value;
 
-    RenderCard("#public_cards_display", card, 0.65);
+    for(var i = 0; i < 4; i++)
+    {
+        if(GameData.PlayerCards[i].c1 == GameData.PublicCards[4] || GameData.PlayerCards[i].c2 == GameData.PublicCards[4])
+        {
+            CreateTheRiver();
+            return;
+        }
+    }
+
+   // RenderCard("#public_cards_display", card, 0.65);
+}
+
+function CheckHands()
+{
+    const PCards = [
+        new Card(GameData.PublicCards[4].split("_"))
+    ]
 }

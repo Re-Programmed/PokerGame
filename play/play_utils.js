@@ -37,6 +37,7 @@ const PLAYER_HTML_ATTRIBS = `<div id="%p%_attribs" style="width: 100%; height: 1
 const PLAYER_HTML = `
 
     <h3>%username%</h3>
+    <div id="player_%p%_cards" class="player_cards_display"><img src=\"../assets/cards/back.png\" width=\"35\" height=\"50\" class=\"no_interpolation\"><img src=\"../assets/cards/back.png\" width=\"35\" height=\"50\" class=\"no_interpolation\"></div>
     <div style="border: 3px solid #222222; background-color: #182920; height: 17px;"><p id="player_%p%_chipcount" style="transform: translateY(-17px); text-align: center;">%chips%</p></div>
 `
 
@@ -391,7 +392,8 @@ function SaveLocalGameState()
         CurrentBet: CurrentBet,
         CurrentPotChips: CurrentPotChips,
         checkingBets: checkingBets,
-        Folded: Folded
+        Folded: Folded,
+        showingCards: showingCards
     }
 
     LocalStorage.UpdateRoomLocalData(LocalGameData);
@@ -444,6 +446,8 @@ function LoadLocalGameState(current_room)
 
     Folded = LocalGameData.Folded;
 
+    showingCards = LocalGameData.showingCards;
+
     checkingBets = LocalGameData.checkingBets;
     
      //Update the text showing how much under or over the current bet you are.
@@ -485,7 +489,8 @@ function ClearLocalGameState()
         ChipCount: [0, 0, 0, 0, 0],
         CurrentBet: 5,
         CurrentPotChips: [],
-        Folded: false
+        Folded: false,
+        showingCards: false
     }
 
     LocalStorage.UpdateRoomLocalData(LocalGameData);
