@@ -1,6 +1,6 @@
 var CurrentTooltip = null
 
-const TOOLTIP_OFFSET = {X: -75, Y: -146}
+const TOOLTIP_OFFSET = {X: -75, Y: -176}
 
 var LastMousePosition = { X: 0, Y: 0 }
 

@@ -36,8 +36,9 @@ var CurrentChipSet = CHIP_SETS.DefaultSet;
 const PLAYER_HTML_ATTRIBS = `<div id="%p%_attribs" style="width: 100%; height: 16px;"></div>`
 const PLAYER_HTML = `
 
-    <h3>%username%</h3>
-    <div id="player_%p%_cards" class="player_cards_display"><img src=\"../assets/cards/back.png\" width=\"35\" height=\"50\" class=\"no_interpolation\"><img src=\"../assets/cards/back.png\" width=\"35\" height=\"50\" class=\"no_interpolation\"></div>
+    <h3 id="player_%p%_name_display">%username%</h3>
+    <div id="player_%p%_cards" class="player_cards_display"><img src=\"%c1dest%\" width=\"35\" height=\"50\" class=\"no_interpolation\"><img src=\"%c2dest%\" width=\"35\" height=\"50\" class=\"no_interpolation\"></div>
+    <p style="display:inline;font-size: 0.5em;" id="player_%p%_hand"></p>
     <div style="border: 3px solid #222222; background-color: #182920; height: 17px;"><p id="player_%p%_chipcount" style="transform: translateY(-17px); text-align: center;">%chips%</p></div>
 `
 
@@ -46,6 +47,11 @@ var CurrentChipMenu = null;
 //Creates the display for a players username, info, and icon.
 function CreatePlayerDisplay(playerNumber, user)
 {
+    var lastImg = $("#player_" + playerNumber + "_cards>img:first-child").attr("src");
+    var lastImg2 = $("#player_" + playerNumber + "_cards>img:last-child").attr("src");
+
+    var useCards = (lastImg != undefined && lastImg != '../assets/cards/back.png');
+
     var ht = PLAYER_HTML;
 
     if(user.icon != null && user.icon != undefined && user.icon != "" && user.icon != "null")
@@ -56,6 +62,14 @@ function CreatePlayerDisplay(playerNumber, user)
     }
 
     ht = ht.replace("%icon%", atob(user.icon)).replace(/%username%/g, user.username).replace(/%chips%/g, user.chips).replace(/%p%/g, playerNumber);
+
+    if(!useCards)
+    {
+        lastImg = '../assets/cards/back.png';
+        lastImg2 = '../assets/cards/back.png';
+    }
+
+    ht = ht.replace("%c1dest%", lastImg).replace("%c2dest%", lastImg2);
 
     $(`#player_${playerNumber}_display`).html(ht).attr("class", "player_display");
 }
@@ -316,8 +330,11 @@ var PotValue = 0;
 var CurrentBet = 0;
 
 //Add a chip object to the pot in the middle.
-function AddChipToPotDisplay(chipValue, dontUpdatePotChips = false)
+function AddChipToPotDisplay(chipValue, dontUpdatePotChips = false, GarunteePot = -1)
 {
+    //Ensure that the # of chips added never exceeds GarunteePot.
+    if(GarunteePot > 0 && PotValue + ChipValues[chipValue - 1] > GarunteePot){return;}
+
     if(!dontUpdatePotChips)
     {
         CurrentPotChips.push(chipValue);
@@ -332,6 +349,8 @@ function AddChipToPotDisplay(chipValue, dontUpdatePotChips = false)
 
     const newChip = document.createElement("img");
     newChip.classList = "no_interpolation pot_chip";
+    newChip.setAttribute("p", Math.floor(x + y));
+    newChip.addEventListener("click", PickUpPotChip);
     newChip.style = `position: fixed; top: ${y}px; left: ${x}px;`
     newChip.src = "../assets/chips/" + CurrentChipSet.folder + "/" + chipValue + ".png";
     AddTooltipElement(newChip, `<h3>${CurrentChipSet.chipNames[chipValue - 1]}</h3><p style="transform: translateY(-7px);">${ChipValues[chipValue - 1]} = $${MonetaryConversions[chipValue - 1]}</p>`)
@@ -393,7 +412,10 @@ function SaveLocalGameState()
         CurrentPotChips: CurrentPotChips,
         checkingBets: checkingBets,
         Folded: Folded,
-        showingCards: showingCards
+        showingCards: showingCards,
+        IHaveShownCards: IHaveShownCards,
+        ICanRecieveWinnings: ICanRecieveWinnings,
+        WaitingScreenDisplayed: WaitingScreenDisplayed
     }
 
     LocalStorage.UpdateRoomLocalData(LocalGameData);
@@ -428,6 +450,11 @@ function LoadLocalGameState(current_room)
         return false;
     }
 
+    if(LocalGameData.LastRoomRound != GameData.RoundsPlayed)
+    {
+        return false;
+    }
+    
     //Set chip amounts to what they were before the reload.
     for(var v = 0; v < LocalGameData.ChipCount.length; v++)
     {
@@ -440,6 +467,8 @@ function LoadLocalGameState(current_room)
     //Change poker hand to match what it was before the reload.
     DrawCardsToHand(LocalGameData.MyCards);
 
+    WaitingScreenDisplayed = LocalGameData.WaitingScreenDisplayed;
+
     //Check if BeginTurn() has already called.
     WasMyTurn = LocalGameData.WasMyTurn;
     UpsetOfCurrent = LocalGameData.UpsetOfCurrent;
@@ -447,6 +476,9 @@ function LoadLocalGameState(current_room)
     Folded = LocalGameData.Folded;
 
     showingCards = LocalGameData.showingCards;
+
+    IHaveShownCards = LocalGameData.IHaveShownCards;
+    ICanRecieveWinnings = LocalGameData.ICanRecieveWinnings;
 
     checkingBets = LocalGameData.checkingBets;
     
@@ -480,6 +512,7 @@ function LoadLocalGameState(current_room)
 //Clears persistent data from games. Should be called when joining a new poker game.
 function ClearLocalGameState()
 {
+    console.error("CLAERED LOCA")
     const LocalGameData = {
         QueuedBets: [],
         WasMyTurn: false,
@@ -490,7 +523,10 @@ function ClearLocalGameState()
         CurrentBet: 5,
         CurrentPotChips: [],
         Folded: false,
-        showingCards: false
+        showingCards: false,
+        IHaveShownCards: false,
+        ICanRecieveWinnings: false,
+        WaitingScreenDisplayed: false
     }
 
     LocalStorage.UpdateRoomLocalData(LocalGameData);
@@ -574,4 +610,106 @@ function CreateScrollText(value, color = "#DDDDDD")
             }
         }
     }, 1)
+}
+
+//Allows you to pick ap and throw around the chips in the pot for fun.
+var heldPotChip = null
+function PickUpPotChip(event)
+{
+    if(!IsMyTurn()){return;}
+
+    if(heldPotChip != null)
+    {
+        heldPotChip = null;
+    }else{
+        heldPotChip = this;
+    }
+
+    MoveUpdateTimer = 0;
+    GameData.G_Fun.x = event.clientX;
+    GameData.G_Fun.y = event.clientY;
+    GameData.G_Fun.p = heldPotChip == null ? GameData.G_Fun.p : heldPotChip.getAttribute("p");
+    API.UpdateRoom(GameData);
+}
+
+var MoveUpdateTimer = 0;
+window.addEventListener('mousemove', function (event) {
+    if(heldPotChip != null)
+    {
+        heldPotChip.setAttribute("style", `position: fixed; top: ${event.clientY - window.innerHeight/2.3}px; left: ${event.clientX - window.innerWidth/2.18}px; transition-duration: 0s;z-index: 5;`);
+
+
+        MoveUpdateTimer++;
+        if(MoveUpdateTimer > 50)
+        {
+            MoveUpdateTimer = 0;
+            GameData.G_Fun.x = event.clientX;
+            GameData.G_Fun.y = event.clientY;
+            GameData.G_Fun.p = heldPotChip.getAttribute("p");
+            API.UpdateRoom(GameData);
+        }
+    }
+})
+
+function VictoryScreen()
+{
+    //CHANGE TO BE A COSMETIC SELECTION
+    RainingChips();
+
+    for(var x = 0; x < 3; x++)
+    {
+        setTimeout(() => {
+            const WinText = document.createElement("h1");
+            WinText.textContent = "You Win!";
+        
+            WinText.setAttribute("class", "win_text");
+        
+            setTimeout(() => {
+                WinText.remove();
+            }, 5000)
+        
+            document.body.appendChild(WinText);
+        }, x * 100)
+    }
+}
+
+function RainingChips()
+{
+    const a = new Audio("../assets/sounds/victory_screen/chip_rain.mp3");
+    a.play();
+
+    setTimeout(() => {
+        a.currentTime = 0;
+        a.play();
+    }, 2205)
+
+    for(var y = 0; y < 200; y++)
+    {
+        setTimeout(() => {
+            const chip = document.createElement("img");
+            chip.src = "../assets/chips/default_set/" + (Math.floor(Math.random() * 5) + 1) + ".png";
+            chip.className = "no_interpolation";
+            chip.width = "64";
+            chip.height = "64";
+
+            const yPos = Math.random() * 100;
+            var xPos = -20;
+            const chipFallInterval = setInterval(() => {
+                chip.setAttribute("style", `position: fixed; top: ${xPos}%; left: ${yPos}%;`);
+                xPos++;
+
+                if(xPos > 100)
+                {
+                    chip.remove();
+                    clearInterval(chipFallInterval);
+                }
+
+                if(xPos == -18)
+                {
+                    document.body.appendChild(chip);
+                }
+            }, 5)
+
+        }, Math.random() * y * 20);
+    }
 }

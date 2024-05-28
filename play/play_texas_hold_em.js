@@ -1,7 +1,8 @@
 //EMPTY ROOM
-//eyJwbGF5ZXJzIjpbIldpbGwiLCJKb2UiXSwiY29kZSI6IiIsImdhbWUiOiJwb2tlciIsInRoZW1lIjoicHRnIiwiQ3VycmVudFR1cm4iOjEsIkN1cnJlbnRCbGluZCI6MSwiQ3VycmVudEJldCI6NSwiQ3VycmVudFN0YWdlIjowLCJSb3VuZHNQbGF5ZWQiOjAsIlF1ZXVlZEJldHMiOltdLCJBbGxJbiI6W10sIkNyZWF0b3IiOiJXaWxsIiwiTWluaW11bUJldCI6NSwiUGxheWVyQ2FyZHMiOlt7ImMxIjpudWxsLCJjMiI6bnVsbH0seyJjMSI6bnVsbCwiYzIiOm51bGx9LHsiYzEiOm51bGwsImMyIjpudWxsfSx7ImMxIjpudWxsLCJjMiI6bnVsbH1dLCJGb2xkZWQiOltdLCJQb3QiOiAwLCAiUGxheWVyQmV0cyI6IFswLCAwLCAwLCAwXSwiQ2hlY2tpbmdCZXRzIjogW10sICJQdWJsaWNDYXJkcyI6WyIiLCIiLCIiLCIiLCIiXSwiU2hvd2luZ0NhcmRzIjotMX0=
+//eyJwbGF5ZXJzIjpbIldpbGwiLCJKb2UiXSwiY29kZSI6IiIsImdhbWUiOiJwb2tlciIsInRoZW1lIjoicHRnIiwiQ3VycmVudFR1cm4iOjEsIkN1cnJlbnRCbGluZCI6MSwiQ3VycmVudEJldCI6NSwiQ3VycmVudFN0YWdlIjowLCJSb3VuZHNQbGF5ZWQiOjAsIlF1ZXVlZEJldHMiOltdLCJBbGxJbiI6W10sIkNyZWF0b3IiOiJXaWxsIiwiTWluaW11bUJldCI6NSwiUGxheWVyQ2FyZHMiOlt7ImMxIjpudWxsLCJjMiI6bnVsbH0seyJjMSI6bnVsbCwiYzIiOm51bGx9LHsiYzEiOm51bGwsImMyIjpudWxsfSx7ImMxIjpudWxsLCJjMiI6bnVsbH1dLCJGb2xkZWQiOltdLCJQb3QiOiAwLCAiUGxheWVyQmV0cyI6IFswLCAwLCAwLCAwXSwiQ2hlY2tpbmdCZXRzIjogW10sICJQdWJsaWNDYXJkcyI6WyIiLCIiLCIiLCIiLCIiXSwiU2hvd2luZ0NhcmRzIjotMSwiV2lubmVycyI6W10sIldhaXRpbmciOnRydWUsIlZvdGVzIjpbXSwiR19GdW4iOnt4OjAseTowfX0===
 
 //TODO:
+    //Somehow the current turn is becoming off sync and two players will be playing at the same time.
     //SOMETIMES ON ENDING YOUR TURN, THE POT WILL RANDOMLY GET CHIPS ADDED TO IT.
     //Show player cards not working for some reason.
     //Add final hand check and winner gets the pot.
@@ -21,7 +22,76 @@ var User = {
 
 var CurrentRoom = "";
 
+const ERROR_InvalidSession = {
+    Message: `
+        <h1 style="text-align: center; animation-name: fade_in_text; animation-duration: 0.8s;">Invalid Session</h1>
+        <h4 style="text-align: center; animation-name: fade_in_text; animation-duration: 0.8s;">An instance of PokerGame is already ruinning on this device. %s</h4>
+        <button style="position:fixed;top: 50%;left: 50%;transform: translate(-50%, -50%) scale(1.45);" onclick="MakeDominantSession()">Make Dominant Session</button>
+    `,
+    ErrorLog: 'Invalid Session: An instance of PokerGame is already ruinning on this device.',
+    AlternateSession: 'Joining a alternate session with account: %s.',
+
+    Unauth: (value) => {
+        invalidSession = true;
+        document.body.innerHTML = ERROR_InvalidSession.Message.replace(/%s/g, alt_account_test == null ? `(${value})` : `(${value}, Alt Account: ${alt_account_test})`);
+        console.warn(ERROR_InvalidSession.ErrorLog);
+
+        clearInterval(updateID);
+    }
+}
+
+const SessionID = Math.floor(Math.random() * 1_000_000_000);
+var invalidSession = false;
+
+//Check if another session has overriden this one.
+setInterval(function () {
+    if(invalidSession){return;}
+    const sessionCheck = JSON.parse(localStorage.getItem("PokerWebsite_ActiveSession" + (alt_account_test == null ? "" : alt_account_test)));
+    if(sessionCheck && sessionCheck.SessionID != null && sessionCheck.SessionID != SessionID)
+    {
+        ERROR_InvalidSession.Unauth("Session Overridden");
+
+        return;
+    }
+},100)
+
+//Forces this window to be the game window.
+function MakeDominantSession()
+{
+    if(window.location.search.includes("&forceValid="))
+    {
+        window.location.reload();
+        return;
+    }
+
+    window.open('./index.html' + window.location.search + "&forceValid=true", "_self");
+}
+
+//On website closed.
+const unload = function () {
+    localStorage.removeItem("PokerWebsite_ActiveSession" + (alt_account_test == null ? "" : alt_account_test));
+}
+
+var alt_account_test = null;
+
 window.addEventListener('load', function () {
+
+    alt_account_test = GetURLParam("alt");
+
+    //Only allow one window to be open.
+    if(localStorage.getItem("PokerWebsite_ActiveSession" + (alt_account_test == null ? "" : alt_account_test)) && !GetURLParam("forceValid"))
+    {
+        ERROR_InvalidSession.Unauth("401 Unauthorized");
+        return;
+    }
+
+    if(alt_account_test != null)
+    {
+        alert(ERROR_InvalidSession.AlternateSession.replace(/%s/g, alt_account_test));       
+    }  
+
+    localStorage.setItem("PokerWebsite_ActiveSession" + (alt_account_test == null ? "" : alt_account_test), JSON.stringify({active: true, SessionID: SessionID}));
+    window.addEventListener('unload', unload);
 
     LoadSwipe(1);
     
@@ -31,8 +101,7 @@ window.addEventListener('load', function () {
         window.open('../signin/index.html?invalid=true', "_self")
     }
 
-    //TESTING
-    const alt_account_test = GetURLParam("alt");
+    //TESTING ACCOUNT
     if(alt_account_test != null)
     {
         acc.username = alt_account_test;
@@ -55,6 +124,11 @@ window.addEventListener('load', function () {
             AddChipValueToSupply(user.money);
             User.chips = GetTotalChipValue();
             API.UpdateUser(User);
+        }
+
+        if(IHaveShownCards)
+        {
+            ShowCards(true);
         }
     })
 
@@ -92,11 +166,12 @@ window.addEventListener('load', function () {
         document.getElementById("bet_display").style = "";
         document.getElementById('bet_display_info').style = "";
 
-        document.getElementById('bet_display_info').innerHTML = `Current Bet: ${GameData.CurrentBet > CurrentBet ? GameData.CurrentBet : CurrentBet}<br><br>Pot: ${PotValue}`
+        document.getElementById('bet_display_info').innerHTML = `Current Bet: ${GameData.CurrentBet > CurrentBet ? GameData.CurrentBet : CurrentBet}<br><br>Pot: ${GameData.Pot}`
     })
 
     $("#deck").on('click', DeckClick);
 })
+
 
 function BeginGame()
 {
@@ -185,9 +260,55 @@ function SetCurrentPlayer(playerNum)
     
 }
 
-setInterval(function () {
+const updateID = setInterval(function () {
     Update();
+
+    if(accelerateUpdate)
+    {
+        setTimeout(() => {
+            Update();
+        }, 500);
+        setTimeout(() => {
+            Update();
+        }, 1000);
+        setTimeout(() => {
+            Update();
+        }, 1500);
+    }
 }, 2000)
+
+function Waiting_JoinTable()
+{
+    if($("#wait_join_button").text().startsWith("Loading")){return;}
+    $("#wait_join_button").text("Loading...");
+    if(!GameData.players.includes(User.username))
+    {
+        GameData.players.push(User.username);
+        API.UpdateRoom(GameData);
+    }else{
+        GameData.players.splice(GameData.players.indexOf(User.username), 1);
+        //Remove players vote if they had voted.
+        if(GameData.Votes.includes(User.username))
+        {
+            GameData.Votes.splice(GameData.Votes.indexOf(User.username), 1);
+        }
+        API.UpdateRoom(GameData);
+    }
+}
+
+function Waiting_VoteStart()
+{
+    if($("#wait_vote_button").text().startsWith("Loading")){return;}
+    $("#wait_vote_button").text("Loading...");
+    if(!GameData.Votes.includes(User.username))
+    {
+        GameData.Votes.push(User.username);
+        API.UpdateRoom(GameData);
+    }else{
+        GameData.Votes.splice(GameData.Votes.indexOf(User.username), 1);
+        API.UpdateRoom(GameData);
+    }
+}
 
 var WasMyTurn = false;
 
@@ -195,8 +316,11 @@ var UpdateNum = 0;
 
 var GottenRoom = false;
 
+var PREVENT_UPDATE = false
+
 function Update(ignoreState = false, forceAPI = false)
 {
+    if(PREVENT_UPDATE){return;}
     if(!IsMyTurn())
     {
         GottenRoom = false;
@@ -205,7 +329,7 @@ function Update(ignoreState = false, forceAPI = false)
     const iS = ignoreState;
     
     //Prevent fetching the room constantly if you are the current player.
-    if(!GottenRoom || forceAPI)
+    if(!GottenRoom || forceAPI || GameData.Waiting)
     {
         console.log("------------------- USED API");
         API.GetRoom(CurrentRoom).then(room => {
@@ -221,8 +345,277 @@ function Update(ignoreState = false, forceAPI = false)
 
 var lastStage = 0, lastShownCards = -1;
 
+var WaitingScreenDisplayed = false;
+
+const playerWaitingChip = `
+    <div class="player_waiting_chip" id="player_%playerName%_waiting">%img%<h3>%playerName%</h3></div>
+`
+
+var waitingPlayers = []
+var startTimer = -500;
+
+var lastGFun = {x:0,y:0,p:0}
+var lastMoveFun = null
+
+var accelerateUpdate = false;
+
+function CheckStartGame()
+{
+    //Force timer to 0.
+    setInterval(() => {
+        startTimer = 0;
+    }, 1);
+
+    if(GameData.Waiting && GameData.Votes.length > 0)
+    {
+        GameData.Waiting = false;
+        GameData.Votes = [];
+
+        //Randomize player order.
+        var playerArr = JSON.parse(JSON.stringify(GameData.players));
+        const ogLength = playerArr.length;
+        for(var i = 0; i < ogLength; i++)
+        {
+            var id = Math.floor(Math.random() * playerArr.length);
+            GameData.players[i] = playerArr[id];
+            playerArr.splice(id, 1);
+        }
+        
+        API.UpdateRoom(GameData).then(d => {
+            ClearLocalGameState();
+            window.location.reload();
+        })
+    }
+}
+
+var wasWaiting = false;
+var delayWrongMoveFun = 0, lastFunText = null;
+
 function performUpdate(room, iS)
 {
+    UpdateNum++;
+    GameData = room;
+
+    if(GameData.Waiting)
+    {
+        $("#waiting_screen").attr("style", "")
+        $("#waiting_cover").attr("style", "")
+
+        wasWaiting = true;
+        ClearLocalGameState();
+
+        //ShowWaitingScreen();
+
+        var tableText = "Table: <br>";
+
+        if(GameData.players.length < waitingPlayers.length)
+        {
+            waitingPlayers = []
+            $("#waiting_screen_players").html("Table: <br><p>Loading...</p>");
+        }
+
+        //Create a little display chip for each player in the room. (display chip can be customized)
+        for(var i = 0; i < GameData.players.length; i++)
+        {
+            if(waitingPlayers.length <= i){waitingPlayers.push({player: "", data: ""});}
+
+            if(waitingPlayers[i].player != GameData.players[i])
+            {
+                waitingPlayers[i].player = GameData.players[i];
+                const i2 = i;
+                API.GetUser(waitingPlayers[i2].player).then(user => {
+                    console.error("API")
+                    var chip = playerWaitingChip.replace(/%playerName%/g, user.username);
+                    if(user.icon != null && user.icon != undefined && user.icon != "null" && user.icon != "")
+                    {
+                        chip = chip.replace(/%img%/g, `<img src="%playerIcon%" width="32" height="32">`).replace(/%playerIcon%/g, atob(user.icon));
+                    }
+                    chip = chip.replace(/%img%/g, "") + "<br>";
+                    waitingPlayers[i2].data = chip;
+                })
+            }
+
+            tableText += waitingPlayers[i].data;
+        }
+
+        if(GameData.players.includes(User.username))
+        {
+            $("#wait_join_button").text("Leave Table");
+            $("#wait_vote_button").attr("style", "visibility: default;");
+        }else{
+            $("#wait_join_button").text("Join Table");
+            $("#wait_vote_button").attr("style", "visibility: hidden;");
+        }
+
+        if(GameData.Votes.includes(User.username))
+        {
+            $("#wait_vote_button").text("Remove Vote");
+        }else{
+            $("#wait_vote_button").text("Vote");
+        }
+
+        var name = GameData.room_name;
+ 
+        //UPDATE START TIMER BASED ON # OF VOTES.
+        if(GameData.Votes.length == GameData.players.length - 1)
+        {
+            if(startTimer < -400)
+            {
+                //Start timer counts down from 20 if all but one player voted.
+                startTimer = 20;
+                const id = setInterval(() => {
+                    if((startTimer < 0 && startTimer > -400) || GameData.Waiting != true)
+                    {
+                        CheckStartGame();
+                        clearInterval(id);
+                    }
+
+                    startTimer--;
+                }, 1300)
+            }else if(startTimer > 40)
+            {
+                startTimer = 40;
+            }
+        }else if(GameData.Votes.length == GameData.players.length)
+        {
+            if(startTimer < -400)
+            {
+                //Start timer counts down from 5 if all players voted.
+                startTimer = 5;
+                const id = setInterval(() => {
+                    if((startTimer < 0 && startTimer > -400) || GameData.Waiting != true)
+                    {
+                        CheckStartGame();
+                        clearInterval(id);
+                    }
+
+                    startTimer--;
+                }, 1300)
+            }else if(startTimer > 5)
+            {
+                startTimer = 5;
+            }
+        }else if(GameData.Votes.length > 0)
+        {
+            if(startTimer < -400)
+            {
+                //Start timer counts down if at least one player voted.
+                startTimer = 80;
+                const id = setInterval(() => {
+                    if((startTimer < 0 && startTimer > -400) || GameData.Waiting != true)
+                    {
+                        CheckStartGame();
+                        clearInterval(id);
+                    }
+
+                    startTimer--;
+                }, 1300)
+            }
+        }else{
+            startTimer = -500;
+        }
+
+        if(startTimer > 0)
+        {
+            name += " - " + startTimer + "s";
+        }else if(startTimer == 0)
+        {
+            name += " - Loading...";
+        }
+
+        $("#waiting_room_name").text(name);
+
+        $("#waiting_screen_players").html(tableText);
+
+        for(var i = 0; i < GameData.Votes.length; i++)
+        {
+            $(`#player_${GameData.Votes[i]}_waiting`).attr("style", "background-color: #846e3055;")
+        }
+
+        return;
+    }
+
+    if(wasWaiting)
+    {
+        ClearLocalGameState();
+        window.location.reload();
+        //wasWaiting = false;
+    }
+
+    //Hide waiting screen.
+    $("#waiting_screen").attr("style", "width: 0; height: 0; position: relative; visibility: none; transform: translate(-5000%, -5000%);")
+    $("#waiting_cover").attr("style", "width: 0; height: 0; position: relative; visibility: none; transform: translate(-5000%, -5000%);")
+    
+    accelerateUpdate = false;
+    delayWrongMoveFun++;
+
+    //Update players best hand
+    if(MyCards.c1 != null && MyCards.c2 != null && GameData.PublicCards[4] != '')
+    {
+        const PCards = [
+            new Card(GameData.PublicCards[0].split("_")[0], GameData.PublicCards[0].split("_")[1]),
+            new Card(GameData.PublicCards[1].split("_")[0], GameData.PublicCards[1].split("_")[1]),
+            new Card(GameData.PublicCards[2].split("_")[0], GameData.PublicCards[2].split("_")[1]),
+            new Card(GameData.PublicCards[3].split("_")[0], GameData.PublicCards[3].split("_")[1]),
+            new Card(GameData.PublicCards[4].split("_")[0], GameData.PublicCards[4].split("_")[1])
+        ]
+    
+        const hand = [ new Card(MyCards.c1.split("_")[0], MyCards.c1.split("_")[1]),
+        new Card(MyCards.c2.split("_")[0], MyCards.c2.split("_")[1])]
+
+        const BHand = GetBestPlayerHand(PCards, hand);
+
+        $("#player_4_hand").text(BHand.hand);
+    }
+
+    if(!IsMyTurn())
+    {
+        if(GameData.G_Fun.x != lastGFun.x || GameData.G_Fun.y != lastGFun.y)
+        {
+            accelerateUpdate = true;
+            delayWrongMoveFun = 0;
+            if(GameData.G_Fun.p != lastGFun.p && $("#pot").children().length > 0)
+            {
+                lastMoveFun = document.getElementById("pot").children[Math.floor(Math.random() * $("#pot").children().length)];
+            }
+    
+            if(lastMoveFun != null)
+            {
+                if(lastFunText != null){
+                    const rm = lastFunText;
+                    lastFunText = null;
+                    rm.setAttribute("class", "remove_lft");
+                    setTimeout(() => {
+                        rm.remove();
+                    }, 300);
+                }
+                lastFunText = document.createElement("p");
+                lastFunText.textContent = GameData.players[GameData.CurrentTurn - 1];
+                lastFunText.setAttribute("style", `position: fixed; top: ${GameData.G_Fun.y - 60}px; left: ${GameData.G_Fun.x - window.innerWidth/20}px; transition-duration: 0.5s;z-index: 5;`);
+                lastFunText.setAttribute("class", "move_fun_text");
+
+                lastMoveFun.setAttribute("style", `position: fixed; top: ${GameData.G_Fun.y - window.innerHeight/2.3}px; left: ${GameData.G_Fun.x - window.innerWidth/2.18}px; transition-duration: 0.5s;z-index: 5;`)
+           
+                document.body.appendChild(lastFunText);
+            }
+    
+            lastGFun = GameData.G_Fun;
+        }
+        
+    }
+
+    if(delayWrongMoveFun < 10)
+    {
+        accelerateUpdate = true;
+    }else if(lastFunText != null){
+        const rm = lastFunText;
+        lastFunText = null;
+        rm.setAttribute("class", "remove_lft");
+        setTimeout(() => {
+            rm.remove();
+        }, 300);
+    }
+
     //ASSIGN PLAYER ID TO WHAT POSITION IN THE ARRAY OF PLAYERS THEY ARE AT.
     if(!reload)
     {
@@ -234,9 +627,6 @@ function performUpdate(room, iS)
             }
         }
     }
-
-    UpdateNum++;
-    GameData = room;
 
     console.log(room)
 
@@ -348,10 +738,30 @@ function performUpdate(room, iS)
         if(v + 1 != ClientData.PlayerNum){i++;}
     }
 
+    if(PotValue != GameData.Pot)
+    {
+        //console.error("Pot is off sync");
+    }
+
     //Update player display if folded.
     if(Folded)
     {
-        $("#player_4_display").attr("style", "transform: scale(0.95); background-color: #00312a;");
+        $("#player_4_display").attr("style", "transform: scale(0.85); background-color: #00312a;");
+    }
+
+    for(var i = 0; i < GameData.Folded; i++)
+    {
+        const playerID = GameData.players.indexOf(GameData.Folded[i]) + 1;
+
+        if(playerID == ClientData.PlayerNum){continue;}
+
+        if(playerID < ClientData.PlayerNum)
+        {
+            $(`#player_${playerID}_display`).attr("style", "transform: scale(0.85);background-color: #00312a;");
+        }else{
+            $(`#player_${playerID - 1}_display`).attr("style", "transform: scale(0.85);background-color: #00312a;");
+        }
+        
     }
 
     //Call the function queue.
@@ -386,8 +796,9 @@ function UpdateAllPlayers(refresh = false)
             continue;
         }
 
-        if(GameData.players[p] != ClientData.Players[p].username || refresh)
+        if(GameData.players[p] != ClientData.Players[p].username || refresh || $(`#player_${i}_name_display`).text() != GameData.players[p])
         {
+            console.error("UPDATE PLAYER:" + $(`#player_${p}_name_display`).text())
             const p2 = p;
             const i2 = i;
             API.GetUser(GameData.players[p2]).then(user => {
@@ -410,9 +821,13 @@ function IsMyTurn()
     return GameData.CurrentTurn == ClientData.PlayerNum;
 }
 
+var activeShowAnimation = false;
 function ShowPlayerCards(player)
 {
+    if(activeShowAnimation){return;}
     if(player == ClientData.PlayerNum){return;}
+
+    activeShowAnimation = true;
 
     player--;
     //Find which display represents this player.
@@ -420,12 +835,12 @@ function ShowPlayerCards(player)
     var i = 0;
     for(var v = 0; v < ClientData.Players.length; v++)
     {
+        if(ClientData.PlayerNum != v){i++;}
+
         if(v == player)
         {
             playerDisplay = i;
         }
-
-        if(ClientData.PlayerNum != v){i++;}
     }
 
     console.error(playerDisplay)
@@ -451,6 +866,7 @@ function ShowPlayerCards(player)
                     setTimeout(() => {
                         $(`#player_${playerDisplay}_cards`).attr("style", "transition-duration: 0.3s; opacity: 1;");              
                         $(`#player_${playerDisplay}_cards>img`).attr("style", "");     
+                        activeShowAnimation = false;
                     }, 0.3 * 1000);
                 }, 2000);
             }, 0.3 * 1000);
@@ -463,6 +879,7 @@ function FinishTurn()
 {
     if(IsMyTurn())
     {
+        PREVENT_UPDATE = true;
         var finishStage = false;
         CreateScrollText("Bet: " + CurrentBet, "lightblue");
         GameData.CurrentTurn++;
@@ -508,7 +925,7 @@ function FinishTurn()
             }else if(!Folded)
             {
                 setTimeout(function () {
-                    CreateScrollText("Matched: " + LastUpset, "lightgreen");
+                    CreateScrollText("Matched: " + CurrentBet, "lightgreen");
                 }, 1000)
             }
         }
@@ -518,6 +935,8 @@ function FinishTurn()
         UpsetOfCurrent = -CurrentBet;
         CurrentBet = 0;
         QueuedBets = [];
+
+        GameData.Pot = PotValue;
 
         if(UpsetOfCurrent > 0)
         {
@@ -565,7 +984,9 @@ function FinishTurn()
 
         WasMyTurn = false;
 
-        API.UpdateRoom(GameData);
+        API.UpdateRoom(GameData).then(d => {
+            PREVENT_UPDATE = false;
+        })
 
         GottenRoom = false;
     }
@@ -623,7 +1044,12 @@ function FinishStage()
                 CreateTheRiver();
                 break;
             case 4:
+                //Show cards.
                 FinishGame_MAIN();
+                break;
+            case 5:
+                //Determine pot payouts.
+                DetermineWinners();
                 break;
         }
     }else{
@@ -673,6 +1099,9 @@ function FinishGame_MAIN()
 
 var showingCards = false;
 
+var IHaveShownCards = false;
+var ICanRecieveWinnings = false;
+
 function BeginTurn()
 {
     Update(false, true);
@@ -689,6 +1118,18 @@ function BeginTurn()
         checkingBets = true;
         CurrentBet = GameData.PlayerBets[ClientData.PlayerNum - 1];
         UpsetOfCurrent = CurrentBet - GameData.CurrentBet;
+    }
+
+    if(GameData.Winners.length > 0)
+    {
+        if(JSON.parse(GameData.Winners[0]).player == ClientData.PlayerNum)
+        {
+            if(!ICanRecieveWinnings)
+            {
+                ICanRecieveWinnings = true;
+                VictoryScreen();
+            }
+        }
     }
 
     //Update all players chip counts.
@@ -721,7 +1162,7 @@ function BeginTurn()
 
     for(var b = 0; b < GameData.QueuedBets.length; b++)
     {
-        AddChipToPotDisplay(GameData.QueuedBets[b]);
+        AddChipToPotDisplay(GameData.QueuedBets[b], false, GameData.Pot);
     }
     //Save local game state on turn begin.
     SaveLocalGameState();
@@ -734,17 +1175,45 @@ function BeginTurn()
         showingCards = true;
     }
 
+    //Ensures that FinishTurn() is not called 2 times.
+    var alreadyFinished = false;
+
+    //All but one player have folded, and you havent folded!, you win!
+    if(GameData.Folded.length >= GameData.players.length - 1 && !GameData.Folded.includes(User.username))
+    {
+        if(!ICanRecieveWinnings)
+        {
+            //Can recieve winnings.
+            ICanRecieveWinnings = true;
+            alreadyFinished = true;
+            VictoryScreen();
+        }
+    }
+
     //We are checking bets and have already matched the given bet. Skip turn.
     if((GameData.CheckingBets.length > 0 && !GameData.CheckingBets.includes(ClientData.PlayerNum)) || Folded || GameData.Folded.includes(ClientData.PlayerNum))
     {
-        FinishTurn();
+        GameData.QueuedBets = [];
+        GameData.CurrentBet = 0;
+        if(!alreadyFinished){FinishTurn(); alreadyFinished = true;}
+    }
+
+    //Full cycle of showing cards.
+    if(GameData.ShowingCards != -1 && (IHaveShownCards || GameData.Folded.includes(ClientData.PlayerNum)))
+    {
+        if(!alreadyFinished){FinishTurn(); alreadyFinished = true;}
+    }else if(GameData.Winners.length > 0)
+    {
+        if(JSON.parse(GameData.Winners[0]).player != ClientData.PlayerNum)
+        {
+            if(!alreadyFinished){FinishTurn(); alreadyFinished = true;}
+        }
     }
     
 }
 
 function UpdatePlayerAttribs()
 {
-    console.log("UPDA")
     ClearAllPlayerAttribs();
 
     if(User.username == GameData.Creator)
@@ -766,10 +1235,8 @@ function UpdatePlayerAttribs()
     
     if(GameData.CurrentBlind == ClientData.PlayerNum)
     {
-        setTimeout(function () {
-            console.log("YOU ARE BLIND")
-            AddPlayerAttrib(4, PLAYER_ATTRIBUTES.BigBlind);
-        }, 1000)
+        console.log("YOU ARE BLIND")
+        AddPlayerAttrib(4, PLAYER_ATTRIBUTES.BigBlind);
     }else{
         AddPlayerAttrib(GameData.CurrentBlind, PLAYER_ATTRIBUTES.BigBlind);
     }
@@ -802,9 +1269,11 @@ var storedButtonData = ''
 
 var showAnimPlaying = false;
 
-function ShowCards()
+function ShowCards(doNotAdvanceTurn = false)
 {
     if(showAnimPlaying){return;}
+
+    const dnat = doNotAdvanceTurn;
 
     showAnimPlaying = true;
     GameData.ShowingCards = ClientData.PlayerNum;
@@ -826,8 +1295,16 @@ function ShowCards()
                     $("#hand").attr("style", "transition-duration: 0.6s;")
                     $("#hand>img").attr("style", "transition-duration: 0.6s;")
 
+                    //Update name cards display.
+                    const card1 = new Card(MyCards.c1.split("_")[0], MyCards.c1.split("_")[1]);
+                    const card2 = new Card(MyCards.c2.split("_")[0], MyCards.c2.split("_")[1]);
+
+                    $("#player_4_cards>img:first-child").attr("src", "../assets/cards/" + card1.GetImage());
+                    $("#player_4_cards>img:last-child").attr("src", "../assets/cards/" + card2.GetImage());
+
                     showAnimPlaying = false;
 
+                    if(dnat){return;}
                     //Finish turn.
                     FinishTurn();
                 }, 2000)
@@ -838,8 +1315,43 @@ function ShowCards()
   
 }
 
+function ClaimPot()
+{
+    if(ICanRecieveWinnings)
+    {
+        PREVENT_UPDATE = true;
+
+        User.chips += GameData.Pot;
+
+        //ADD CONVERSION FROM CHIPS TO MONEY!
+        User.money = User.chips;
+
+        API.UpdateUser(User).then(d => {
+
+            StartNewGame();
+
+            PREVENT_UPDATE = false;
+        })
+    }
+}
+
 function UpdateButtons()
 {
+    if(ICanRecieveWinnings)
+    {
+        $("#all_in_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
+        document.getElementById("all_in_button").setAttribute("disabled", "true");
+
+        $("#check_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
+        $("#fold_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
+        $("#raise_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
+
+        $("#event_display").attr("style", "font-size: 0.95em;");
+        $("#event_display").text("Claim pot.");
+
+        return;
+    }
+
     if(showingCards && IsMyTurn())
     {
         if(storedButtonData == '')
@@ -939,6 +1451,36 @@ function UpdateButtons()
         $("#event_display").text("Wait...");
     }
 
+}
+
+//Called after a game has ended to bring up waiting screens etc.
+function StartNewGame()
+{
+    GameData.AllIn = [];
+    GameData.CheckingBets = [];
+    GameData.CurrentBet = GameData.MinimumBet;
+    
+    GameData.CurrentTurn = 1;
+    GameData.CurrentStage = 0;
+
+    GameData.RoundsPlayed++;
+    GameData.QueuedBets = [];
+    GameData.PlayerCards = [{c1: null, c2: null},{c1: null, c2: null},{c1: null, c2: null},{c1: null, c2: null}];
+    GameData.Folded = [];
+    GameData.Pot = 0;
+    GameData.PlayerBets = [0,0,0,0];
+    GameData.CheckingBets = [];
+    GameData.PublicCards = ["","","","",""]
+    GameData.ShowingCards = -1;
+    GameData.Waiting = true;
+    GameData.Winners = [];
+    GameData.Votes = [];
+    GameData.G_Fun = {x:0,y:0,p:0}
+
+    API.UpdateRoom(GameData).then(d => {
+        ClearLocalGameState();
+        window.location.reload();
+    });
 }
 
 function Match()
@@ -1061,9 +1603,51 @@ function CreateTheRiver()
    // RenderCard("#public_cards_display", card, 0.65);
 }
 
-function CheckHands()
+function DetermineWinners()
 {
+    GameData.ShowingCards = -1;
+
     const PCards = [
-        new Card(GameData.PublicCards[4].split("_"))
+        new Card(GameData.PublicCards[0].split("_")[0], GameData.PublicCards[0].split("_")[1]),
+        new Card(GameData.PublicCards[1].split("_")[0], GameData.PublicCards[1].split("_")[1]),
+        new Card(GameData.PublicCards[2].split("_")[0], GameData.PublicCards[2].split("_")[1]),
+        new Card(GameData.PublicCards[3].split("_")[0], GameData.PublicCards[3].split("_")[1]),
+        new Card(GameData.PublicCards[4].split("_")[0], GameData.PublicCards[4].split("_")[1])
     ]
+
+    var hands = []
+    for(var v = 0; v < 4; v++)
+    {
+        if(GameData.PlayerCards[v].c1 != null && GameData.PlayerCards[v].c2 != null)
+        {
+            hands.push([ new Card(GameData.PlayerCards[v].c1.split("_")[0], GameData.PlayerCards[v].c1.split("_")[1]),
+                         new Card(GameData.PlayerCards[v].c2.split("_")[0], GameData.PlayerCards[v].c2.split("_")[1]) ])                           
+        }
+    }
+
+    const winner = FindWinner(hands, PCards);   
+
+    GameData.Winners = [JSON.stringify(winner)]
+}
+
+function ShowWaitingScreen()
+{
+    console.error("WAITING")
+}
+
+var timeoutTimer = 0, lastPlayerGoing = 0;
+
+//Handles the information to detect if the current player has left or gone AFK, forcing them to fold.
+setInterval(HandleTimeoutTimer, 1100);
+function HandleTimeoutTimer()
+{
+    if(IsMyTurn()){return;}
+
+    if(lastPlayerGoing != GameData.CurrentTurn)
+    {
+        lastPlayerGoing = GameData.CurrentTurn;
+        timeoutTimer = 40;
+    }
+
+    
 }
