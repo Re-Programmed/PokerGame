@@ -268,7 +268,7 @@ html, body {
 {
     display: inline;
     margin-left: 5px;
-    font-size: 3vw;
+    font-size: 1.75em;
 
     margin-bottom: 12px;
 }
@@ -494,7 +494,102 @@ html, body {
 {
     display: inline;
     position: relative;
+}
 
+.player_waiting_chip
+{
+    border: 1px solid #233d2f00;
+    border-bottom: 1px solid var(--bg-dark);   
+
+    padding: 5px;
+    margin: 5px;
+    margin-bottom: 0;
+    margin-top: 0;
+
+    transition-duration: 0.3s;
+}
+
+.player_waiting_chip > h3
+{
+    display: inline-block;
+    border-left: 12px;
+    transform: translate(12px, 5px);
+}
+
+#waiting_cover
+{
+    position: fixed;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    background-color: #00000075;
+}
+
+#waiting_cover_removed
+{
+    position: fixed;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    animation-name: remove_waiting_cover;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes remove_waiting_cover {
+    from { background-color: #00000075; }
+    to { background-color: #00000000; }
+}
+
+.player_waiting_chip > img
+{
+    transform: translateY(11.5px);
+}
+
+.player_waiting_chip:hover
+{
+    border: 1px solid var(--bg-dark);   
+}
+
+#waiting_screen
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+    padding: 12px;
+
+    z-index: 6;
+
+    width: 44%;
+}
+
+#waiting_screen_removed
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+    padding: 12px;
+
+    z-index: 6;
+
+    animation-name: remove_waiting_screen;
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+@keyframes remove_waiting_screen {
+    from { transform: scale(1) translate(-50%, -50%); }
+    to { transform: scale(0) translate(-500%, -500%); }
 }
 
 .player_cards_display>img
@@ -505,4 +600,52 @@ html, body {
 .player_cards_display>img:hover
 {
     transform: translateY(-8px);
+}
+
+@keyframes fade_in_text {
+    from { color: #DDDDDD00; }
+    to { color: #DDDDDDFF; }
+}
+
+@keyframes fade_out_text {
+    to { color: #DDDDDD00; }
+    from { color: #DDDDDDFF; }
+}
+
+
+.move_fun_text
+{
+    animation-name: fade_in_text;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+}
+
+.remove_lft
+{
+    animation-name: fade_out_text;
+    animation-duration: 0.25s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes Win_Text_Animation {
+    0% { transform: translate(-50%, -50%) scale(0); color: #ffd70055; }
+    25% { transform: translate(-50%, -50%) scale(5); color: #ffd700; }
+    75% { transform: translate(-50%, -50%) scale(5); color: #ffd700; }
+    100% { transform: translate(-50%, -50%) scale(0); color: #ffd70055; }
+}
+
+.win_text
+{
+    z-index: 10;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(5);
+
+    color: #ffd700;
+
+    animation-name: Win_Text_Animation;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
 }
