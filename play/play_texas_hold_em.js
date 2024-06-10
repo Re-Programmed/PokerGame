@@ -20,6 +20,10 @@ var User = {
     
 }
 
+var Spectating = false;
+
+var currentUser; //READONLY
+
 var CurrentRoom = "";
 
 const ERROR_InvalidSession = {
@@ -116,11 +120,13 @@ window.addEventListener('load', function () {
 
         CreatePlayerDisplay(4, user);
 
-        LoadLocalGameState("Cool Room");
 
         if(GetTotalChipValue() < 1)
         {
             //ADD CONVERSION RATE FOR MONEY TO CHIPS BASED ON ROOM STAKES.
+            var add = user.money;
+
+
             AddChipValueToSupply(user.money);
             User.chips = GetTotalChipValue();
             API.UpdateUser(User);
@@ -284,14 +290,29 @@ function Waiting_JoinTable()
     if(!GameData.players.includes(User.username))
     {
         GameData.players.push(User.username);
+
+        //Remove player from spectators list.
+        if(GameData.watching.includes(User.username))
+        {
+            GameData.watching.splice(GameData.watching.indexOf(User.username), 1);
+        }
+
         API.UpdateRoom(GameData);
     }else{
         GameData.players.splice(GameData.players.indexOf(User.username), 1);
+        
+        if(!GameData.watching.includes(User.username))
+        {
+            //Add player to spectators list.
+            GameData.watching.push(User.username);
+        }
+
         //Remove players vote if they had voted.
         if(GameData.Votes.includes(User.username))
         {
             GameData.Votes.splice(GameData.Votes.indexOf(User.username), 1);
         }
+
         API.UpdateRoom(GameData);
     }
 }
@@ -391,10 +412,126 @@ function CheckStartGame()
 var wasWaiting = false;
 var delayWrongMoveFun = 0, lastFunText = null;
 
+var retLocal = false;
+
+var lastSPECTATETurn = -1, lastSPECTATEBets = [];
+var last3PLAYERCheckPot = 0;
+
 function performUpdate(room, iS)
 {
+    currentUser = User;
     UpdateNum++;
     GameData = room;
+
+    Spectating = false;
+    if(!GameData.players.includes(User.username)){Spectating = true;}
+
+    if(Spectating)
+    {
+        if(lastSPECTATETurn != GameData.CurrentTurn || GameData.CheckingBets.length != lastSPECTATEBets.length)
+        {
+            for(var i = 0; i < GameData.QueuedBets.length; i++) 
+            {
+                AddChipToPotDisplay(GameData.QueuedBets[i]);
+            }
+
+            lastSPECTATETurn = GameData.CurrentTurn;
+            lastSPECTATEBets = GameData.CheckingBets;
+        }
+        $("#spectator_text").css("visibility", "");
+
+        if(GameData.Waiting)
+        {
+            if(!GameData.watching.includes(User.username))
+            {
+                GameData.watching.push(User.username);
+                API.UpdateRoom(GameData);
+            }
+        }
+    }else{
+        $("#spectator_text").css("visibility", "hidden");
+
+        //You are not spectating but it is not your turn and someone else ended their turn. The pot should be updated.
+        if(last3PLAYERCheckPot != GameData.CurrentTurn && !IsMyTurn() && !(GameData.CurrentTurn - 1 == ClientData.PlayerNum) && !GameData.Waiting)
+        {
+            last3PLAYERCheckPot = GameData.CurrentTurn;
+            if(GameData.QueuedBets.length > 0)
+            {
+                GameData.QueuedBets.forEach(bet => AddChipToPotDisplay(bet));
+            }
+        }
+
+        if(last3PLAYERCheckPot != GameData.CurrentTurn && !IsMyTurn() && !GameData.Waiting)
+        {
+            BeginTurnCountdown(10);
+        }
+    }
+
+    //Prevent countdown if waiting.
+    if(GameData.Waiting)
+    {
+        CancelTurnTimer();
+        last3PLAYERCheckPot = -5;
+    }
+
+    if(CurrentTurnTimer < 2 && IsMyTurn() && !Folded)
+    {
+        Fold(true);
+    }
+
+    if(CurrentTurnTimer < 2 && !IsMyTurn())
+    {
+        console.log("FORCED FOLD");
+        GameData.Folded.push(GameData.players[GameData.CurrentTurn - 1]);
+
+        const prevTurn = GameData.CurrentTurn;
+
+        GameData.CurrentTurn++;
+
+        var finishStage = false;
+        if(GameData.players.length < GameData.CurrentTurn)
+        {
+            finishStage = true;
+            GameData.CurrentTurn = 1;
+        }
+
+        //Clear any bets the player made since they timed out.
+        GameData.QueuedBets = [];
+        UpsetOfCurrent = -CurrentBet;
+        CurrentBet = 0;
+        QueuedBets = [];
+
+        if(finishStage)
+        {
+            FinishStage();
+        }
+
+        if(GameData.CheckingBets.length > 0)
+        {
+            //Remove the player from the checking bets array.
+            if(GameData.CheckingBets.includes(prevTurn))
+            {
+                GameData.CheckingBets.splice(GameData.CheckingBets.indexOf(prevTurn), 1);
+            }
+
+            checkingBets = false;
+        }
+
+        //Save local game state on end.
+        SaveLocalGameState();
+
+        API.UpdateRoom(GameData).then(d => {
+            PREVENT_UPDATE = false;
+        })
+
+        GottenRoom = false;
+    }
+
+    if(!retLocal)
+    {
+        LoadLocalGameState(GetURLParam("table"));
+        retLocal = true;
+    }
 
     if(GameData.Waiting)
     {
@@ -407,6 +544,16 @@ function performUpdate(room, iS)
         //ShowWaitingScreen();
 
         var tableText = "Table: <br>";
+
+        //Update list of spectating players.
+        $("#waiting_spectator_display").html(`<p>Spectating: </p>`);
+        for(var i = 0; i < GameData.watching.length; i++)
+        {
+            if(GameData.watching[i] != null)
+            {
+                $("#waiting_spectator_display").append(`<p>${GameData.watching[i]}</p>`);
+            }
+        }
 
         if(GameData.players.length < waitingPlayers.length)
         {
@@ -443,6 +590,7 @@ function performUpdate(room, iS)
             $("#wait_join_button").text("Leave Table");
             $("#wait_vote_button").attr("style", "visibility: default;");
         }else{
+
             $("#wait_join_button").text("Join Table");
             $("#wait_vote_button").attr("style", "visibility: hidden;");
         }
@@ -457,7 +605,8 @@ function performUpdate(room, iS)
         var name = GameData.room_name;
  
         //UPDATE START TIMER BASED ON # OF VOTES.
-        if(GameData.Votes.length == GameData.players.length - 1)
+        if(GameData.players.length < 2){startTimer = -500;} 
+        else if(GameData.Votes.length == GameData.players.length - 1)
         {
             if(startTimer < -400)
             {
@@ -539,7 +688,7 @@ function performUpdate(room, iS)
     {
         ClearLocalGameState();
         window.location.reload();
-        //wasWaiting = false;
+        wasWaiting = false;
     }
 
     //Hide waiting screen.
@@ -565,7 +714,10 @@ function performUpdate(room, iS)
 
         const BHand = GetBestPlayerHand(PCards, hand);
 
-        $("#player_4_hand").text(BHand.hand);
+        const display = POKER_HANDS[BHand.hand].name;
+
+        $("#player_4_hand").text(display);
+        $("#player_4_hand").attr("style", "font-size: 24px;")
     }
 
     if(!IsMyTurn())
@@ -818,6 +970,7 @@ function queue(v){funcQueue.push(v);}
 //Check if it is the current users turn. Functions that modify the server should only be called if it is the users turn.
 function IsMyTurn()
 {
+    if(Spectating){ClientData.PlayerNum = 9999;return false;}
     return GameData.CurrentTurn == ClientData.PlayerNum;
 }
 
@@ -1104,6 +1257,9 @@ var ICanRecieveWinnings = false;
 
 function BeginTurn()
 {
+    Spectating = false;
+    if(!GameData.players.includes(User.username)){Spectating = true;return;}
+
     Update(false, true);
     if(!IsMyTurn()){return;}
 
@@ -1168,6 +1324,9 @@ function BeginTurn()
     SaveLocalGameState();
 
     GameData.QueuedBets = [];
+
+    //Begin the countdown for turn length limit.
+    BeginTurnCountdown();
 
     //We are currently on the reveal hands stage.
     if(GameData.CurrentStage == 4)
@@ -1319,6 +1478,9 @@ function ClaimPot()
 {
     if(ICanRecieveWinnings)
     {
+       ClaimPotAnimation(ClientData.PlayerNum);
+
+       setTimeout(() => {
         PREVENT_UPDATE = true;
 
         User.chips += GameData.Pot;
@@ -1332,27 +1494,69 @@ function ClaimPot()
 
             PREVENT_UPDATE = false;
         })
+       }, 3000)
     }
+}
+
+function ClaimPotAnimation(player)
+{
+    const chips = Array.from(document.getElementsByClassName("pot_chip"));
+    chips.forEach(chip => {
+        const c = chip;
+        var op = 100;
+        var get = "top";
+        var add = 1;
+
+        switch(player)
+        {
+            case ClientData.PlayerNum:
+                break;
+            case 1:
+            case 2:
+                get = "left";
+                add = -1;
+                break;
+            case 3:
+                get = "top";
+                add = -1;
+                break;
+            case 4:
+                get = "left";
+                break;
+        }
+
+        const cInt = setInterval(() => {
+            c.style[get] = (parseFloat(c.style[get].replace("px", "")) + (add * 2.2)) + "px";
+
+            op -= 0.85;
+            c.style.opacity = op;
+
+            if(op < -200)
+            {
+                c.remove();
+                clearInterval(cInt);
+            }
+        })
+    })
 }
 
 function UpdateButtons()
 {
     if(ICanRecieveWinnings)
     {
+        storedButtonData = document.getElementById("button_game_options").innerHTML;
+
         $("#all_in_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
         document.getElementById("all_in_button").setAttribute("disabled", "true");
-
-        $("#check_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
-        $("#fold_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
-        $("#raise_button").attr("style", "background-color: #51212155; color: #DDDDDD55; border: #1d614055; transform: scale(1);");
+        $("#button_game_options").html(`<button onclick="ClaimPot()" id="show_cards_button">Claim Pot</button>`);
+        $("#show_cards_button").attr("style", "width: 95%;");
 
         $("#event_display").attr("style", "font-size: 0.95em;");
         $("#event_display").text("Claim pot.");
 
-        return;
-    }
 
-    if(showingCards && IsMyTurn())
+        return;
+    }else if(showingCards && IsMyTurn())
     {
         if(storedButtonData == '')
         {
@@ -1477,6 +1681,8 @@ function StartNewGame()
     GameData.Votes = [];
     GameData.G_Fun = {x:0,y:0,p:0}
 
+    GameData.watching = []
+
     API.UpdateRoom(GameData).then(d => {
         ClearLocalGameState();
         window.location.reload();
@@ -1527,8 +1733,17 @@ function AllIn()
 
 var Folded = false;
 
-function Fold()
+function Fold(ignoreMenu = false)
 {
+    if(ignoreMenu)
+    {
+        if(!IsMyTurn()) {return;}
+
+        Folded = true;
+        FinishTurn();
+        return;
+    }
+
     CreateConfirmationMenu("Fold?", function () {
         if(!IsMyTurn()) {return;}
 

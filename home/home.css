@@ -3,14 +3,22 @@
     to{ color: var(--text-color); }
 }
 
-#user_icon
+#user_icon_border
 {
-    border: 3px solid #30501d;
+    background-color: #30501d;
     border-radius: 5px;
 
-    width: 96px;
-    height: 96px;
+    width: 102px;
+    height: 102px;
     display: inline-block;
+}
+
+#user_icon
+{
+    margin-left: 3px;
+    margin-top: 3px;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
 }
 
 #user_username
@@ -31,7 +39,7 @@
 #account_display
 {
     background-color: var(--bg-color);
-    width: 33%;
+    width: 51%;
     padding: 12px;
 
     border: 3px solid var(--bg-dark);
@@ -42,4 +50,210 @@
 
 body{
     overflow: hidden;
+}
+
+#chip_display
+{
+    background-color: var(--bg-dark);
+    padding: 0px;
+    padding-left: 7px;
+    border: 3px solid var(--bg-light);
+}
+
+#customize_options
+{
+    position: absolute;
+    right: 7px;
+    top: 60px;
+    width: 35%;
+
+    height: 600px;
+    
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-light);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.customize_field > h3
+{
+    margin-left: 7px;
+}
+
+.customize_field
+{
+    border-bottom: 2px solid var(--bg-dark);
+}
+
+@keyframes fadeup_block
+{
+    from{background-color: #00000000;}
+    to{}
+}
+
+.block_field
+{
+    width: 100%;
+    height: 21%;
+    position: absolute;
+
+    background-color: #00000077;
+    border-radius: 5px;
+
+    animation-name: fadeup_block;
+    animation-duration: 0.3s;
+
+    transition-duration: 0.6s;
+}
+
+.block_field > h2
+{
+    position: absolute;
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+
+    transition-duration: 0.6s;
+}
+
+.block_field:hover
+{
+    background-color: #6e6e0055;
+}
+
+.block_field:hover > h2
+{
+    color: gold;
+}
+
+select
+{
+    transition-duration: 0.3s;
+}
+
+select:hover
+{
+    transform: scale(1.05);
+}
+
+#my_pot_display, #my_cards_display_parent, #chip_set_picker, #card_pack_picker
+{
+    margin-top: 20px;
+    height: 300px;
+    width: calc(51% + 24px);
+
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+#chip_set_picker, #card_pack_picker
+{
+    height: 600px;
+    justify-content: flex-start;
+}
+
+#applied_chip_sets, #unapplied_chip_sets, #applied_card_packs, #unapplied_card_packs
+{
+    height: 150px;
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.product_display
+{
+    margin: 5px;
+
+    width: 200px;
+    height: 100%;
+    
+    transition-duration: 0.3s;
+
+    user-select: none;
+}
+
+.product_display:hover
+{
+    transform: scale(1.13);
+    background-color: rgb(71, 61, 0);
+}
+
+#pot_image
+{
+    width: 248px;
+    height: 248px;
+
+    background-image: url('../assets/pot.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+body
+{
+    overflow-y: scroll !important;
+}
+
+
+body::-webkit-scrollbar {
+    width: 16px;
+}
+body::-webkit-scrollbar-track {
+background: #274737;        /* color of the tracking area */
+}
+body::-webkit-scrollbar-thumb {
+background-color: var(--bg-light);
+border: 3.5px solid #274737;
+transition-duration: 0.3s;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    transform: scale(1.05);
+    background-color: #29694a;
+}
+
+#my_cards_display
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.player_card_display
+{
+    transition-duration: 0.3s;
+    image-rendering: pixelated;
+}
+
+.player_card_display:hover
+{
+    transform: scale(2.3);
+    z-index: 3;
+
+    filter: drop-shadow(5px 5px 5px #00000066);
+}
+
+@keyframes apply_button_fade {
+    from{opacity: 0;}
+    to{}
+}
+
+.apply_button
+{
+    opacity: 1;
+
+    animation-name: apply_button_fade;
+    animation-duration: 0.3s;
 }

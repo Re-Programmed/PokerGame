@@ -1,11 +1,19 @@
 var CurrentTooltip = null
 
-const TOOLTIP_OFFSET = {X: -75, Y: -176}
+var TOOLTIP_OFFSET = {X: -75, Y: -176}
 
 var LastMousePosition = { X: 0, Y: 0 }
 
 function AddTooltipElement(element, tip)
 {
+    if(currentUser != undefined)
+    {
+        if(tooltipIDP_GetSetting(currentUser.username, "tooltips", true) != true)
+        {
+            return;
+        }
+    }
+    
     element.setAttribute("tooltip", tip);
 
     element.addEventListener('mouseenter', function (event) { 
@@ -47,3 +55,15 @@ window.addEventListener('mousemove', function (event) {
 
     LastMousePosition = {X: event.clientX, Y: event.clientY};
 })
+
+function tooltipIDP_GetSetting(username, setting, defaultVal = false)
+{
+    var currentSettings = JSON.parse(localStorage.getItem("poker_game_settings_" + currentUser.username));
+
+    if(currentSettings == null)
+    {
+        currentSettings = {};
+    }
+
+    return currentSettings[setting] == undefined ? defaultVal : currentSettings[setting];
+}

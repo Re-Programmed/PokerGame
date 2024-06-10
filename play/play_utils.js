@@ -415,7 +415,8 @@ function SaveLocalGameState()
         showingCards: showingCards,
         IHaveShownCards: IHaveShownCards,
         ICanRecieveWinnings: ICanRecieveWinnings,
-        WaitingScreenDisplayed: WaitingScreenDisplayed
+        WaitingScreenDisplayed: WaitingScreenDisplayed,
+        wasWaiting: wasWaiting
     }
 
     LocalStorage.UpdateRoomLocalData(LocalGameData);
@@ -475,6 +476,8 @@ function LoadLocalGameState(current_room)
 
     Folded = LocalGameData.Folded;
 
+    wasWaiting = LocalGameData.wasWaiting;
+
     showingCards = LocalGameData.showingCards;
 
     IHaveShownCards = LocalGameData.IHaveShownCards;
@@ -526,55 +529,14 @@ function ClearLocalGameState()
         showingCards: false,
         IHaveShownCards: false,
         ICanRecieveWinnings: false,
-        WaitingScreenDisplayed: false
+        WaitingScreenDisplayed: false,
+        wasWaiting: false
     }
 
     LocalStorage.UpdateRoomLocalData(LocalGameData);
 }
 
-var CurrentConfirmMenu = null;
 
-function CreateConfirmationMenu(message, okCallback)
-{
-    if(CurrentConfirmMenu != null){CurrentConfirmMenu.remove();}
-
-    const menu = document.createElement("div");
-    menu.style = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: var(--bg-color);
-        border: 3px solid var(--bg-dark);
-        border-radius: 5px;
-        padding: 7px;
-        text-align: center;
-    `
-
-    menu.innerHTML = `<h2>${message}</h2>`;
-
-    const okButton = document.createElement("button");
-    const cancelButton = document.createElement("button");
-    okButton.textContent = "Continue";
-    cancelButton.textContent = "Cancel";
-
-    const okBack = okCallback;
-    okButton.addEventListener('click', function () {
-        if(CurrentConfirmMenu != null){CurrentConfirmMenu.remove();}
-
-        okBack();
-    });
-    cancelButton.addEventListener('click', function () {
-        if(CurrentConfirmMenu != null){CurrentConfirmMenu.remove();}
-    })
-
-    menu.appendChild(okButton);
-    menu.appendChild(cancelButton);
-
-    document.body.appendChild(menu)
-
-    CurrentConfirmMenu = menu;
-}
 
 //Creates text that scrolls up the screen.
 function CreateScrollText(value, color = "#DDDDDD")
@@ -711,5 +673,40 @@ function RainingChips()
             }, 5)
 
         }, Math.random() * y * 20);
+    }
+}
+
+var CurrentTurnTimer = 100;
+function SubtractTurnTimer()
+{
+    CurrentTurnTimer--;
+    $("#timer_countdown").css('width', `${CurrentTurnTimer}%`)
+}
+
+var turnCountdown = null;
+function BeginTurnCountdown(add = 0)
+{
+    CancelTurnTimer();
+    CurrentTurnTimer = 100;
+    turnCountdown = setInterval(function () {
+        if(CurrentTurnTimer < 1)
+        {
+            clearInterval(turnCountdown);
+            turnCountdown = null;
+            return;
+        }
+
+        SubtractTurnTimer();
+        //Convert turn timer to milliseconds per 1 SubtractTurnTimer() call (i.e. /100 * 1000).
+    },  (add + TURN_LENGTH_LIMIT) * 10);
+}
+
+function CancelTurnTimer()
+{
+    if(turnCountdown != null)
+    {
+        clearInterval(turnCountdown);
+        CurrentTurnTimer = 100;
+        turnCountdown = null;
     }
 }
