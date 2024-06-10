@@ -139,6 +139,11 @@ const API = {
         return u;
     },
 
+    SetLeaderboard: async function (board) {
+        const data = await this.SendItem("leaderboard", btoa(JSON.stringify(board)));
+        return data;
+    },
+
     GetRoom_TEST: async function ()
     {
         return await FAKE_SERVER;

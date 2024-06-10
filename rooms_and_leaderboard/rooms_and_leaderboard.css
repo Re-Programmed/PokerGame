@@ -123,6 +123,28 @@
     transition-duration: 0.3s;
 }
 
+.user_leaderboard > p
+{
+    transition-duration: 0.5s;
+}
+
+.user_leaderboard > p:hover:first-child
+{
+    transform: scale(1.7);
+    background-color: var(--bg-color);
+}
+
+.user_leaderboard > p:hover
+{
+    filter: drop-shadow(3px 3px 5px #00000055);
+}
+
+.user_leaderboard > p:hover:not(:first-child)
+{
+    transform: scale(1.1);
+    background-color: var(--bg-color);
+}
+
 .user_leaderboard_info
 {
     text-align: center;
@@ -133,4 +155,103 @@
     padding: 7px;
     
     border-left: 3px solid var(--bg-color);
+}
+
+.hover_green
+{
+    transition-duration: 0.3s;
+    background-color: #00FF0000;
+}
+
+.hover_green:hover
+{
+    background-color: var(--bg-light);
+}
+
+
+@keyframes news_article_spin_in {
+    from{ transform: scale(0) translate(-50%, -50%) rotate(180deg); opacity: 0; }
+    to{}
+}
+
+#news_article
+{
+    transform: scale(1) translate(-50%, -50%) rotate(0deg);
+    filter: drop-shadow(5px 5px 7px #00000067);
+
+    animation-name: news_article_spin_in;
+    animation-duration: 0.8s;
+
+    transition-duration: 0.3s;
+}
+
+#dead_news
+{
+    transform: scale(1) translate(-50%, -50%) rotate(0deg);
+    filter: drop-shadow(5px 5px 7px #00000067);
+
+    animation-name: news_article_spin_in;
+    animation-duration: 0.8s;
+    animation-direction: reverse;
+    animation-fill-mode: both;
+
+    transition-duration: 0.3s;
+}
+
+.news_button
+{
+    position: relative;
+    z-index: 6;
+}
+
+#outdated_rooms_button
+{
+    opacity: 0.75;
+    transform: scale(0.7);
+    margin-left: -15px;
+}
+
+@keyframes float_motion_news {
+    0%{transform: translate(-50%, -50%) rotate(-3deg);}
+    50%{transform: translate(-50%, -50%) rotate(3deg);}
+    100%{transform: translate(-50%, -50%) rotate(-3deg);}
+}
+
+#float_news_article
+{
+    transition-duration: 0.3s;
+
+    transform: translate(-50%, -50%) rotate(-10deg);
+
+    filter: drop-shadow(12px 12px 7px #00000067);
+
+    animation-name: float_motion_news;
+    animation-duration: 7.2s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+body
+{
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+body::-webkit-scrollbar {
+    width: 16px;
+}
+
+body::-webkit-scrollbar-track {
+background: #274737;        /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+background-color: var(--bg-light);
+border: 3.5px solid #274737;
+transition-duration: 0.3s;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    transform: scale(1.05);
+    background-color: #29694a;
 }

@@ -15,31 +15,41 @@
 <body>
     <script src="../jquery-3.7.1.min.js"></script>
     <script src="../data.js"></script>
+    <script src="../text_censor.js"></script>
     <script src="../main.js"></script>
+    <script src="../store/catalog.js"></script>
+    <script src="../settings_retriever.js"></script>
     <script src="./rooms_and_leaderboard.js"></script>
 
     <div id="selection_menu">
         <button id="sign_in_button">Sign In</button>
         <button id="acc_button">My Account</button>
-        <button id="ral_button" enabled="false">Rooms & Leaderboard</button>
+        <button id="ral_button" enabled="false">Tables & Leaderboard</button>
+        <button id="store_button">Store</button>
+        <button id="settings_button">Settings</button>
+        <input id="search_input" oninput="CreateSearchMenu(this.value)" placeholder="Search..." style="float: right;margin-top: 6px;margin-right: 6px;transform: scale(1);width: 300px;">
     </div>
 
-    <div id="room_list_container">
+    <div id="room_list_container" class="theme_bg_change">
         <h1>Tables</h1>
-        <button id="random_room_button">Join Random</button>
-        <button id="enter_code_button">Enter Room Name</button>
+        <button id="random_room_button" onclick="JoinRandom()">Join Random</button>
+        <button id="enter_code_button" onclick="CreateEnterRoomNameGUI()">Enter Room Name</button>
         <button id="create_room_button" onclick="CreateRoom()">Create Room</button>
 
-        <div id="room_list">
-            <div class="room">
-                <p class="room_info">Table Name</p>
-                <p class="room_info">Game</p>
-                <p class="room_info" style="border-right: none;">Table Size</p>
+        <div id="room_list" class="theme_bg_change">
+            <div class="room theme_bg_change">
+                <p class="room_info theme_bg_change">Table Name</p>
+                <p class="room_info theme_bg_change">Game</p>
+                <p class="room_info theme_bg_change">Table Size</p>
+                <p class="room_info theme_bg_change">Stake</p>
+                <p class="room_info theme_bg_change" style="border-right: none;">Minimum Bet</p>
             </div>
         </div>
+
+        <button id="outdated_rooms_button" onclick="ShowOutdatedRooms()">Show Outdated Rooms</button>
     </div>
   
-    <div id="leaderboard">
+    <div id="leaderboard" class="theme_bg_change">
         <h1>Leaderboard</h1>
 
     </div>

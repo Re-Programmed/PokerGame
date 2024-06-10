@@ -1,0 +1,58 @@
+.settings_option > h2
+{
+    display: inline;
+
+    transition-duration: 0.3s;
+}
+
+.settings_option
+{
+    background-color: var(--bg-color);
+    border-bottom: 2px solid var(--bg-dark);
+
+    padding: 7px;
+}
+
+#settings_container
+{
+    margin-top: 7px;
+    padding: 7px;
+    
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="checkbox"] {
+    /* Remove default checkbox. */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    width: 70px;
+    height: 35px;
+    padding: 0;
+
+    border-radius: 5px;
+    outline: none;
+
+    transition-duration: 0.3s;
+
+    transform: scale(1) translateY(5px);
+}
+
+input[type="checkbox"]::before {
+    content: "";
+    display: inline-block;
+    width: 50%;
+    height: calc(100% - 6px);
+    margin: 3px;
+    background-color: gray; /* The default checkbox color. */
+
+    transition-duration: 0.3s;
+  }
+  
+  input[type="checkbox"]:checked::before {
+    transform: translateX(calc(100% - 6px));
+
+    background-color: green; /* The color when the checkbox is checked. */
+  }

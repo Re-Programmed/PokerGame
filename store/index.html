@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Index Fund - Play</title>
+
+    <link rel="icon" href="../assets/logo_dark.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css"></link>
+    <link rel="stylesheet" href="./store.css"></link>
+</head>
+<body>
+    <script src="../jquery-3.7.1.min.js"></script>
+    <script src="../data.js"></script>
+    <script src="../main.js"></script>
+    <script src="../card_data.js"></script>
+    <script src="../tooltip_manager.js"></script>
+    <script src="./catalog.js"></script>
+    <script src="./store.js"></script>
+
+    <div id="selection_menu">
+        <button id="sign_in_button">Sign In</button>
+        <button id="acc_button">My Account</button>
+        <button id="ral_button">Rooms & Leaderboard</button>
+        <button id="store_button" enabled="false">Store</button>
+        <button id="settings_button">Settings</button>
+        <input id="search_input" oninput="CreateSearchMenu(this.value)" placeholder="Search..." style="float: right;margin-top: 6px;margin-right: 6px;transform: scale(1);width: 300px;">
+    </div>
+
+    <div id="money_display" class="theme_bg_change">
+        <h2>Loading...</h2>
+        <h2 id="user_dollar_count">$0</h2>
+        <h2 id="user_cosmetic_points">0</h2>
+    </div>
+
+    <div id="daily_shop_items" class="theme_bg_change">
+        <h2>Daily Shop (0% off)</h2>
+        <span id="daily_shop_items_content"></span>
+    </div>
+
+    <div id="shop_packs" class="theme_bg_change">
+        <h2>Daily Packs</h2>
+        <span id="shop_packs_content"></span>
+    </div>
+
+    <div id="shop_permanent_items" class="theme_bg_change">
+        <h2>Catalog</h2>
+    </div>
+</body>
+</html>

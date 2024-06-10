@@ -32,7 +32,12 @@
         <button id="sign_in_button">Sign In</button>
         <button id="acc_button" enabled="false">My Account</button>
         <button id="ral_button">Rooms & Leaderboard</button>
+        <button id="store_button">Store</button>
+        <button id="settings_button">Settings</button>
+        <input id="search_input" oninput="CreateSearchMenu(this.value)" placeholder="Search..." style="float: right;margin-top: 6px;margin-right: 6px;transform: scale(1);width: 300px;">
     </div>
+
+    <div id="timer_countdown"></div>
 
     <div id="bet_display" style="background-color: #00000000; border: 3px solid #00000000;">
         <p id="bet_display_info" style="color: #DDDDDD00;">Current Bet: 5<br><br>Pot: 15</p>
@@ -67,7 +72,9 @@
     <div id="waiting_screen">
         <h1 id="waiting_room_name">Room Name</h1>
         <p id="waiting_screen_players">Table: </p>
-        <p>Spectating: </p>
+        <div id="waiting_spectator_display">
+            <p>Spectating: </p>
+        </div>
         <button id="wait_join_button" onclick="queue(Waiting_JoinTable())">Join Table</button>
         <button id="wait_vote_button" onclick="queue(Waiting_VoteStart())">Vote Start</button>
     </div>
@@ -94,7 +101,7 @@
             </div>
         </div>
         <div id="button_game_options">
-            <button id="fold_button">Fold</button>
+            <button id="fold_button" onclick="Fold()">Fold</button>
             <button id="check_button" onclick="Match()">Match</button>
             <button id="raise_button" onclick="NextTurn()">Next Turn / Check</button>
         </div>
@@ -107,6 +114,8 @@
     <div id="turn_details">
         <h1 id="turn_details_info">0</h1>
     </div>
+
+    <h2 id="spectator_text">SPECTATING</h2>
 
 </body>
 </html>
