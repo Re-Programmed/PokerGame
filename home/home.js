@@ -50,7 +50,7 @@ window.addEventListener('load', function () {
         //Update icon.
         if(user.icon != null && user.icon != undefined && user.icon != "null")
         {
-            $("#user_icon").attr("src", atob(user.icon));
+            $("#user_icon").css("background-image", "url('" + atob(user.icon) + "')");
         }
 
         //Update name.

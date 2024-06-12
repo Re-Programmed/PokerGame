@@ -69,9 +69,10 @@ function CreateAccount()
         
         if(last_icon != null && last_icon != undefined)
         {
-            if(last_icon[0].size > 500)
+            console.log(last_icon[0].size);
+            if(last_icon[0].size > 2000)
             {
-                FailCreate('Your user icon is to large. (minimum 32x32 pixels)', "#create_icon")
+                FailCreate('Your user icon is to large. (maximum 2000)', "#create_icon")
                 return;
             }
             
@@ -94,7 +95,7 @@ function CreateAccount()
 
 function FinishCreate(username, passcode, icon)
 {
-    API.UpdateUser({ username: username, passcode: btoa(btoa(btoa(passcode))), icon: btoa(icon) }).then(d => {
+    API.UpdateUser({ username: username, passcode: btoa(btoa(btoa(passcode))), icon: btoa(icon), chips: 0, money: 5000, cpoints: 0, customize: {BGColor: "default", NameColor: "default", Font: "default", Border: "default", Set: [-1], Pack: [-1], Theme: "default"}, c_unlock: [], c_owned: [], stats: {wins: 0}, l_board: "", ll_check:0 } ).then(d => {
         SignIn(username, passcode);
     })
 }
