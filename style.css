@@ -1,0 +1,181 @@
+:root
+{
+    --bg-dark: #233d2f;
+    --bg-color: #2d523f;
+    --bg-light: #1d6140;
+
+    --text-color: #DDDDDD;
+
+    --default-font: "Merriweather", serif;
+}
+
+body{
+    background-image: url("./assets/bg_tile.png");
+    background-size: 4%;
+
+    color: var(--text-color);
+    font-family: var(--default-font);
+}
+
+input, button, select,option, textarea{
+    outline: none;
+
+    border: 3px solid var(--bg-light);
+    background-color: var(--bg-dark);
+
+    padding: 6px;
+    border-radius: 5px;
+    margin: 4px;
+
+    color: var(--text-color);
+    font-family: var(--default-font);
+
+    transition-duration: 0.2s;
+}
+
+input:hover, button:hover
+{
+    background-color: #1e3925;
+    transform: scale(1.05);
+}
+
+input:placeholder-shown
+{
+    background-color: #2c3620;
+}
+
+input:not(:placeholder-shown), button:active
+{
+    background-color: #29331d;
+}
+
+button:focus, input:focus
+{
+    border: 3px solid var(--bg-color);
+    transform: scale(1.1);
+}
+
+#selection_menu
+{
+    background-color: var(--bg-dark);
+    margin-left: -8px;
+    margin-top: -8px;
+
+    width: calc(100% + 16px);
+
+    height: 50px;
+}
+
+#selection_menu > button
+{
+    transform: scale(1) !important;
+    border: none;
+    height: 100%;
+
+    border-radius: 0;
+    margin: 0px;
+
+}
+
+.no_interpolation { 
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated;                 /* Universal support since 2021   */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+
+}
+
+img
+{
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+
+}
+
+@keyframes Tooltip_Create {
+    from { background-color: #1d614000; border: 3px solid #29331d00; color: #DDDDDD00; }
+    to {}
+}
+
+.tooltip
+{
+    position: fixed;
+    
+    width: 150px;
+    height: 75px;
+
+    margin: 0;
+
+    background-color: #1d6140CC;
+    border: 3px solid #29331d77;
+
+    text-align: center;
+    padding: 5px;
+
+    animation-name: Tooltip_Create;
+    animation-duration: 0.25s;
+}
+
+@keyframes Tooltip_Remove {
+    from {}
+    to { background-color: #1d614000; border: 3px solid #29331d00; color: #DDDDDD00; }
+}
+
+.tooltip_removed
+{
+    animation-name: Tooltip_Remove;
+    animation-duration: 0.25s;
+}
+
+.center_popup
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.search_menu
+{
+    position:fixed;
+    top: 40px; 
+    right: 6px; 
+    width: 318px; 
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction:column;
+
+    user-select: none;
+}
+
+.search_menu > p:hover, .search_menu > span:hover
+{
+    transform: scale(1.075) translateX(1%);
+    border: 2px solid var(--bg-dark);
+    background-color: var(--bg-dark);
+
+    color: gold;
+}
+
+.search_menu > p, .search_menu > span
+{
+    padding: 5px;
+
+    margin: 0;
+
+    border-bottom: 2px solid var(--bg-dark);
+
+    transition-duration: 0.3s;
+
+    user-select: none;
+}
+
+@font-face {
+    font-family: 'RobotoMono';
+    src: url('./assets/fonts/RobotoMono.ttf');
+  }
+  

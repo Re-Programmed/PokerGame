@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokerPanic! - Play</title>
+
+    <link rel="icon" href="../assets/logo_dark.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+CU:wght@100..400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css"></link>
+    <link rel="stylesheet" href="./play.css"></link>
+</head>
+<body>
+    <script src="../jquery-3.7.1.min.js"></script>
+    <script src="../data.js"></script>
+    <script src="../sound_manager.js"></script>
+    <script src="../main.js"></script>
+    <script src="../store/catalog.js"></script>
+    <script src="../text_censor.js"></script>
+    <script src="../card_data.js"></script>
+    <script src="../tooltip_manager.js"></script>
+    <script src="./hand_eval.js"></script>
+    <script src="./play_utils.js"></script>
+    <script src="./play_texas_hold_em.js"></script>
+
+    <div id="selection_menu">
+        <button id="sign_in_button">Sign In</button>
+        <button id="acc_button" enabled="false">My Account</button>
+        <button id="ral_button">Rooms & Leaderboard</button>
+        <button id="store_button">Store</button>
+        <button id="settings_button">Settings</button>
+        <input id="search_input" oninput="CreateSearchMenu(this.value)" placeholder="Search..." style="float: right;margin-top: 6px;margin-right: 6px;transform: scale(1);width: 300px;">
+    </div>
+
+    <div id="timer_countdown"></div>
+
+    <div id="bet_display" style="background-color: #00000000; border: 3px solid #00000000;">
+        <p id="bet_display_info" style="color: #DDDDDD00;">Current Bet: 5<br><br>Pot: 15</p>
+    </div>
+
+    <div id="pot" class="no_interpolation">
+
+    </div>
+
+    <div id="deck">
+        
+    </div>
+
+    <div id="hand">
+
+    </div>
+
+    <div id="player_1_display" class="player_display_hidden theme_bg_change">
+
+    </div>
+    <div id="player_2_display" class="player_display_hidden theme_bg_change">
+
+    </div>
+    <div id="player_3_display" class="player_display_hidden theme_bg_change">
+
+    </div>
+
+    <div id="player_4_display" class="player_display_hidden theme_bg_change">
+
+    </div>
+
+    <div id="waiting_screen" class="theme_bg_change">
+        <h1 id="waiting_room_name">Room Name</h1>
+        <p id="waiting_screen_players">Table: </p>
+        <div id="waiting_spectator_display">
+            <p>Spectating: </p>
+        </div>
+        <button id="wait_join_button" onclick="queue(Waiting_JoinTable())">Join Table</button>
+        <button id="wait_vote_button" onclick="queue(Waiting_VoteStart())">Vote Start</button>
+    </div>
+    <div id="waiting_cover"></div>
+
+    <div id="public_cards_display"></div>
+
+    <div id="chips" class="theme_dark_bg_change">
+        <div id="chip_counter">
+            <div id="chip_1_display" class="chip_display">
+
+            </div>
+            <div id="chip_2_display" class="chip_display">
+                
+            </div>
+            <div id="chip_3_display" class="chip_display">
+                
+            </div>
+            <div id="chip_4_display" class="chip_display">
+                
+            </div>
+            <div id="chip_5_display" class="chip_display" style="border: none !important;">
+                
+            </div>
+        </div>
+        <div id="button_game_options">
+            <button id="fold_button" onclick="pthe_0x155_func_button_f()">Fold</button>
+            <button id="check_button" onclick="pthe_0x155_func_button_m()">Match</button>
+            <button id="raise_button" onclick="pthe_0x155_func_button_nt()">Next Turn / Check</button>
+        </div>
+        <div id="button_game_options_2">
+            <button id="all_in_button" onclick="pthe_0x155_func_button_ai()">All In</button>
+            <button id="event_display" onclick="">Draw Card</button>
+        </div>  
+    </div>
+   
+    <div id="turn_details">
+        <h1 id="turn_details_info">0</h1>
+    </div>
+
+    <h2 id="spectator_text">SPECTATING</h2>
+
+</body>
+</html>

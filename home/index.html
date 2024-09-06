@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokerPanic! - Home</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+CU:wght@100..400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css"></link>
+    <link rel="stylesheet" href="./home.css"></link>
+</head>
+<body>
+    <script src="../jquery-3.7.1.min.js"></script>
+    <script src="../data.js"></script>
+    <script src="../sound_manager.js"></script>
+    <script src="../main.js"></script>
+    <script src="../text_censor.js"></script>
+    <script src="../tooltip_manager.js"></script>
+    <script src="../card_data.js"></script>
+    <script src="../store/catalog.js"></script>
+    <script src="./home.js"></script>
+
+    <div id="selection_menu">
+        <button id="sign_in_button">Sign In</button>
+        <button id="acc_button" enabled="false">My Account</button>
+        <button id="ral_button">Rooms & Leaderboard</button>
+        <button id="store_button">Store</button>
+        <button id="settings_button">Settings</button>
+        <input id="search_input" oninput="CreateSearchMenu(this.value)" placeholder="Search..." style="float: right;margin-top: 6px;margin-right: 6px;transform: scale(1);width: 300px;">
+    </div>
+
+    <div id="account_display" class="theme_border_only_change">
+        <div id="user_icon" style="z-index: 2 !important; position: relative;">
+            <img id="user_icon_border" style="z-index: 1 !important; position: relative;">
+        </div>
+        <h1 id="user_username"></h1>
+        <div id="chip_display" class="theme_dark_bg_change"><p id="chip_display_count">1000</p></div>
+        <img id="user_big_blind_chip_display" src="../assets/chips/default_set/big_blind_chip.png" width="32" height="32" class="no_interpolation" style="padding-top: 7px;">
+    </div>
+
+    <div id="my_pot_display" class="theme_bg_change">
+        <h2>Pot</h2>
+        <div id="pot_image">
+            
+        </div>
+    </div>
+
+    <div id="chip_set_picker" class="theme_bg_change">
+        <h2>Chip Set Applicator</h2>
+        <h5 style="color: lightgreen;">Applied</h5>
+        <div id="applied_chip_sets"></div>
+        <br><br><br>
+        <h5 style="color: rgb(255, 110, 110);">Unapplied</h5>
+        <div id="unapplied_chip_sets"></div>
+    </div>
+
+    <div id="my_cards_display_parent" class="theme_bg_change">
+        <h2>Deck</h2>
+        <span id="my_cards_display">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    </div>
+
+    <div id="card_pack_picker" class="theme_bg_change">
+        <h2>Card Pack Applicator</h2>
+        <h5 style="color: lightgreen;">Applied</h5>
+        <div id="applied_card_packs"></div>
+        <br><br><br>
+        <h5 style="color: rgb(255, 110, 110);">Unapplied</h5>
+        <div id="unapplied_card_packs"></div>
+    </div>
+
+    <div id="customize_options" class="theme_bg_change">
+        <button style="opacity: 0.5;transform: scale(1);" onclick="ApplyChanges()" id="apply_button">Apply</button>
+        <div id="customize_bg_color" class="customize_field dark_bottom_theme">
+            <h3>Background Color: </h3>
+            <input>
+        </div>
+        <div id="customize_name_color" class="customize_field dark_bottom_theme">
+            <h3>Name Color: </h3>
+            <input>
+        </div>
+        <div id="customize_font" class="customize_field dark_bottom_theme">
+            <h3>Font: </h3>
+            <select style="width: 56%;">
+                <option value="default">Default</option>
+            </select>
+        </div>
+        <div id="customize_border" class="customize_field dark_bottom_theme">
+            <h3>Border: </h3>
+            <select style="width: 56%;">
+                <option value="default">Default</option>
+            </select>
+        </div>
+        <div id="customize_theme" class="customize_field dark_bottom_theme">
+            <h3>Table Theme: </h3>
+            <select style="width: 56%;">
+                <option value="default">Default</option>
+            </select>
+        </div>
+    </div>
+
+</body>
+</html>

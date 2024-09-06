@@ -1,0 +1,37 @@
+
+#pp_level_display
+{
+    margin-top: 15px;
+}
+
+#xp_level_holder
+{
+    width: 200px;
+    height: 25px;
+
+    background-color: var(--bg-color);
+    border-radius: 3px;
+
+    display: inline-block;
+    margin-bottom: -5px;
+}
+
+#xp_level_value
+{
+    background-color: gold;
+    height: 80%;
+    transform: translateY(10%) translateX(2%);
+}
+
+#coming_soon_text
+{
+    color: rgb(190, 0, 0);
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+
+    transform: translate(-50%, -50%) rotate(-15deg) scale(3);
+}

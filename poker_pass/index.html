@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokerPanic! - Roulette</title>
+
+    <link rel="icon" href="../assets/logo_dark.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css"></link>
+    <link rel="stylesheet" href="./poker_pass.css"></link>
+</head>
+<body>
+    <script src="../jquery-3.7.1.min.js"></script>
+    <script src="../data.js"></script>
+    <script src="../sound_manager.js"></script>
+    <script src="../main.js"></script>
+    <script src="../store/catalog.js"></script>
+
+    <script src="./poker_pass.js"></script>
+
+    <div id="selection_menu">
+        <button id="sign_in_button">Sign In</button>
+        <button id="acc_button" enabled="false">My Account</button>
+        <button id="ral_button">Rooms & Leaderboard</button>
+        <button id="store_button">Store</button>
+        <button id="settings_button">Settings</button>
+        <input id="search_input" oninput="CreateSearchMenu(this.value)" placeholder="Search..." style="float: right;margin-top: 6px;margin-right: 6px;transform: scale(1);width: 300px;">
+    </div>
+
+    <div id="pp_level_display">
+        <h3 style="display: inline;">XP</h3>
+        <div id="xp_level_holder"><div id="xp_level_value"></div></div>
+        <h3 style="display: inline;">Level: 4</h3>
+    </div>
+
+    <h1 id="coming_soon_text">Coming Soon!</h1>
+</body>
+</html>

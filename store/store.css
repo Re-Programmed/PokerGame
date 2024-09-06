@@ -1,0 +1,241 @@
+body
+{
+    overflow: hidden;
+}
+
+#daily_shop_items
+{
+    width: 57%;
+    height: 220px;
+
+    margin-top: 7px;
+
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+}
+
+#daily_shop_items_content, #shop_packs_content
+{
+    display: flex;
+    justify-content: center;
+}
+
+#shop_packs
+{
+    position: absolute;
+    width: 56.5%;
+    height: 250px;
+
+    bottom: 4.86%;
+
+    margin-top: 5%;
+
+    background-color: #2a4939;
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+}
+
+
+#daily_shop_items > h2, #shop_packs > h2, #shop_permanent_items > h2
+{
+    margin: 0;
+    margin-top: 6px;
+    margin-left: 6px;
+
+    font-size: 20px;
+}
+
+#shop_packs_content > .product_display:first-child:hover > .no_interpolation
+{
+    transform: scale(1.3) rotate(-10deg);
+    filter: drop-shadow(7px 7px 15px #00000062);
+}
+
+#shop_packs_content > .product_display:last-child:hover > .no_interpolation
+{
+    transform: scale(1.3) rotate(10deg);
+    filter: drop-shadow(7px 7px 15px #00000062);
+}
+
+.product_display > .no_interpolation
+{
+    transition-duration: 0.3s;
+
+    filter: drop-shadow(7px 7px 2px #00000062);
+}
+
+.product_display
+{
+    margin: 5px;
+
+    width: 200px;
+    height: 200px;
+
+    background-color: #274636;
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+    
+    transition-duration: 0.3s;
+
+    user-select: none;
+}
+
+.product_display:hover
+{
+    transform: scale(1.13);
+    background-color: rgb(71, 61, 0);
+}
+
+#money_display
+{
+    margin-top: 7px;
+    background-color: var(--bg-light);
+    border-radius: 0px;
+    padding: 7px;
+
+    user-select: none;
+}
+
+#money_display > h2
+{
+    display: inline;
+}
+
+#user_dollar_count
+{
+    float: right;
+    margin-top: 0px;
+
+    color: rgb(255, 235, 125);
+
+    transition-duration: 0.3s;
+}
+
+#money_display > h2:first-child
+{
+    transition-duration: 0.3s;
+}
+
+#user_dollar_count:hover
+{
+    color: rgb(255, 217, 0);
+    transform: scale(1.1) translateX(-12px);
+}
+
+#money_display > h2:first-child:hover
+{
+    transform: scale(1.1) translateX(12px);
+}
+
+#user_cosmetic_points
+{
+    float: right;
+    margin-top: 0px;
+    margin-right: 15px;
+    color: rgb(125, 235, 255);
+    transition-duration: 0.3s;
+}
+
+#user_cosmetic_points:hover
+{
+    color: rgb(0, 217, 255);
+    transform: scale(1.1) translateX(-12px);
+}    
+
+#shop_permanent_items
+{
+    position: absolute;
+
+    right: 7px;
+    top: 110px;
+
+    width: 37%;
+    height: 80%;
+
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 14px; padding-right: 14px;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#shop_permanent_items::-webkit-scrollbar, .scroll_fancy::-webkit-scrollbar {
+    width: 16px;
+}
+#shop_permanent_items::-webkit-scrollbar-track, .scroll_fancy::-webkit-scrollbar-track {
+background: #274737;        /* color of the tracking area */
+}
+#shop_permanent_items::-webkit-scrollbar-thumb, .scroll_fancy::-webkit-scrollbar-thumb {
+background-color: var(--bg-light);
+border: 3.5px solid #274737;
+transition-duration: 0.3s;
+}
+
+#shop_permanent_items::-webkit-scrollbar-thumb:hover, .scroll_fancy::-webkit-scrollbar-thumb:hover {
+    transform: scale(1.05);
+    background-color: #29694a;
+}
+
+@keyframes create_purchased_text {
+    from{transform: translate(-50%, -50%) scale(0) rotate(180deg);}
+    to{}
+}
+
+.purchased_text
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: gold;
+    z-index: 7;
+
+    animation-name: create_purchased_text;
+    animation-duration: 0.75s;
+
+    transition-duration: 0.75s;
+}
+
+.too_much_stamp
+{
+    position: absolute;
+    width: 12%;
+
+    transform: translate(1%, 50px) rotate(-45deg);
+
+    z-index: 3;
+
+    image-rendering: pixelated;
+
+    filter: drop-shadow(5px 5px 4px #00000077);
+
+    transition-duration: 0.3s;
+}
+
+#daily_shop_items_content > .product_display:hover > .too_much_stamp, #shop_packs_content > .product_display:hover > .too_much_stamp
+{
+    width: 100%;
+    opacity: 0.35;
+}
+
+@keyframes pack_item_below_reveal_create {
+    from{ transform: scale(0); }
+    to{}   
+}
+
+.pack_item_below_reveal > div
+{
+    border: none; 
+    background-color: #00000000;
+
+    animation-name: pack_item_below_reveal_create;
+    animation-duration: 0.82s;
+}

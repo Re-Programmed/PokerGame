@@ -1,0 +1,673 @@
+:root
+{
+    --number-font: "Abril Fatface", serif;
+}
+
+#deck
+{
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+#hand
+{
+    display: flex;
+    position: absolute;
+    bottom: 65px;
+    left: 50px;
+    width: 40%;
+    margin-left: 30%;
+    flex-direction: row;
+    align-content: center;
+    justify-content: space-around;
+}
+
+@keyframes DeckCard_Create {
+    from { height: 0; margin-top: 200px; }
+    to { height: 200px; margin-top: 0; }
+}
+
+.deck_card
+{
+    animation-name: DeckCard_Create;
+    animation-duration: 1s;
+
+    transition-duration: 0.2s;
+}
+
+
+.deck_card:hover
+{
+    transform: translateY(-270px) translateX(-100%) scale(1.055) !important;
+    filter: drop-shadow(0px 4px 3px black);
+}
+
+.card_render:hover
+{
+    transform: scale(1.07) translateY(-12px);
+    filter: drop-shadow(0px 15px 3px black);
+
+}
+
+.card_render
+{
+    transition-duration: 0.25s;
+    filter: drop-shadow(0px 3px 3px black);
+}
+
+#chips
+{
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+
+    height: 225px;
+
+    margin-left: 17px;
+
+    background-color: var(--bg-color);
+
+    width: 30%;
+
+    position: fixed;
+
+    bottom: 38px;
+}
+
+#chip_counter
+{
+    border: 3px solid #222222;
+    background-color: #182920;
+
+    height: 77.81px;
+
+    margin: 7px;
+
+    text-align: center;
+
+    font-family: var(--number-font);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.chip_display
+{
+    height: 32px;
+    width: 64px;
+    
+    max-height: 32px;
+
+    border-right: 3px solid #282828;
+    margin-top: 0;
+}
+
+.chip_display > img
+{
+    height: 48px;
+    width: 48px;
+
+    position: absolute;
+    top: 40px;
+
+    transform: translateX(-24px);
+}
+
+#button_game_options_2
+{
+    height: 44px !important;
+    width: 100%;
+}
+
+#button_game_options, #button_game_options_2
+{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 82px;
+
+    justify-content: space-around;
+    align-content: center;
+}
+
+#button_game_options > button
+{
+    width: 33%;
+}
+
+#button_game_options_2 > button
+{
+    width: 50%;
+}
+
+#event_display
+{
+    background-color: var(--bg-color);
+}
+
+#event_display:hover
+{
+    animation: none !important;
+    transform: none !important;
+}
+
+#event_display:focus
+{
+    transform: none !important;
+    border: 3px solid var(--bg-light) !important;
+}
+
+#fold_button, #check_button, #raise_button, #all_in_button
+{
+    transition-duration: 0.25s;
+}
+
+#fold_button:hover
+{
+    background-color: #663333;
+}
+
+#check_button:hover
+{
+    background-color: #336633;
+}
+
+#raise_button:hover
+{
+    background-color: #333366;
+}
+
+#all_in_button:hover
+{
+    background-color: #336666;
+}
+
+#pot
+{
+    background-image: url('../assets/pot.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    position: fixed;
+    top: 50%; left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 180px; height: 180px;
+}
+
+.player_display
+{
+    position: fixed;
+
+    width: 250px;
+    height: 80px;
+
+    background-color: var(--bg-color);
+
+    padding: 7px;
+
+    border: 3px solid var(--bg-light);
+    border-radius: 5px;
+
+    box-shadow: 8px 12px 1.5px #00000033;
+
+    transition-duration: 0.4s;
+}
+
+.player_display_hidden
+{
+    position: fixed;
+
+    width: 250px;
+    height: 80px;
+
+    background-color: #2d523f99;
+
+    padding: 7px;
+
+    border: 3px solid var(--bg-light);
+    border-radius: 5px;
+
+    box-shadow: 8px 12px 1.5px #00000022;
+
+    transition-duration: 0.4s;
+}
+
+.player_display > img
+{
+    display: inline;
+
+    padding: 0;
+    margin: 0;
+    width: 48px;
+    height: 48px;
+}
+
+.player_display > h3
+{
+    display: inline;
+    margin-left: 5px;
+    font-size: 1.75em;
+
+    margin-bottom: 12px;
+}
+
+.player_display > p
+{
+    transform: translateY(-15px);
+}
+
+#player_1_display
+{
+    left: 5%;
+    top: 30%;
+}
+
+#player_2_display
+{
+    top: 10%;
+    right: 8%;
+    margin-right: 0;
+
+}
+
+#player_3_display
+{
+    right: 5%;
+    top: 30%;
+}
+
+
+#public_cards_display
+{
+    position: fixed;
+
+    top: 10%;
+    left: 8%;
+
+    width: 50%;
+    height: 13.5%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+@keyframes PublicCard_Spawn {
+    from {transform: scale(1.5); opacity: 0;}
+    to {}
+}
+
+#public_cards_display > img
+{
+    animation-name: PublicCard_Spawn;
+    animation-duration: 0.5s;
+}
+
+#player_4_display
+{
+    margin-left: 17px;
+    width: calc(30% - 15px) !important;
+    bottom: 278px;
+
+    height: 96px;
+
+    box-shadow: none !important;
+}
+
+@keyframes Chip_Create {
+    from { height: 0; }
+    to { }
+}
+
+
+.chip, .chip_f{
+    transition-duration: 0.25s;
+
+    animation-name: Chip_Create;
+    animation-duration: 0.5s;
+}
+
+
+.chip_f
+{
+    transform: scaleX(-1) translateX(24px) !important;
+}
+
+.chip:hover
+{
+    transform: translateY(5px) translateX(-12px) scale(1.05);
+}
+
+.chip_f:hover
+{
+    transform: translateY(5px) translateX(-12px) scale(-1.05, 1.05) !important; 
+}
+
+@keyframes pot_chip_enter {
+    from {transform: translateX(400px); opacity: 0;}
+    to{}
+}
+.pot_chip
+{
+    width: 48px;
+    height: 48px;
+
+    animation-name: pot_chip_enter;
+    animation-duration: 0.5s;
+
+    transition-duration: 0.25s;
+}
+
+.pot_chip:hover
+{
+    transform: scale(1.275);
+}
+
+#chip_menu
+{
+    background-color: #2d523f99;
+    border: 3px solid var(--bg-light);
+
+    width: 100px;
+    height: 50px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#chip_menu > button
+{
+    height: 100%;
+    background-color: #00000000;
+    border: none;
+
+    border-radius: 0;
+}
+
+#chip_menu > button:hover
+{
+    background-color: var(--bg-dark);
+}
+
+.attrib_display
+{
+    transition-duration: 0.25s;
+    transform: translateY(-3.5px);
+    z-index: 1;
+}
+
+.attrib_display:hover
+{
+    transform: scale(4) translateY(-3.5px);
+    z-index: 3;
+}
+
+#bet_display
+{
+    position: fixed;
+    left: 50%;
+    top: 25%;
+    transform: translateX(-50%);
+
+    width: 180px;
+    height: 90px;
+
+    background-color: var(--bg-light);
+    border: 3px solid var(--bg-dark);
+
+    border-radius: 5px;
+
+    transition-duration: 0.25s;
+}
+
+#bet_display_info
+{
+    transition-duration: 0.25s;
+
+    text-align: center;
+}
+
+#player_4_chipcount, #player_3_chipcount, #player_2_chipcount, #player_1_chipcount
+{
+    font-family: var(--number-font);
+}
+
+#turn_details
+{
+    position: fixed;
+    right: 5.3%;
+    bottom: 280px;
+
+    text-align: center;
+
+    width: 140px;
+}
+
+@keyframes Card_Create {
+    from { height: 0; }
+    to { }
+}
+
+.card_render
+{
+    animation-name: Card_Create;
+    animation-duration: 0.25s;
+}
+
+@keyframes show_card_back_flip {
+    from{ transform: scaleX(0); filter: drop-shadow(3px 100x 3px #00000033); }
+    to{ transform: scaleX(-1); filter: drop-shadow(3px 200px 3px #00000033); }
+}
+.show_card_back
+{
+    animation-name: show_card_back_flip;
+    animation-duration: 0.3s;
+
+    animation-fill-mode: forwards;
+}
+
+.player_cards_display
+{
+    display: inline;
+    position: relative;
+}
+
+.player_waiting_chip
+{
+    border: 1px solid #233d2f00;
+    border-bottom: 1px solid var(--bg-dark);   
+
+    padding: 5px;
+    margin: 5px;
+    margin-bottom: 0;
+    margin-top: 0;
+
+    transition-duration: 0.3s;
+}
+
+.player_waiting_chip > h3
+{
+    display: inline-block;
+    border-left: 12px;
+    transform: translate(12px, 5px);
+}
+
+#waiting_cover
+{
+    position: fixed;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    background-color: #00000075;
+}
+
+#waiting_cover_removed
+{
+    position: fixed;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    animation-name: remove_waiting_cover;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes remove_waiting_cover {
+    from { background-color: #00000075; }
+    to { background-color: #00000000; }
+}
+
+.player_waiting_chip > img
+{
+    transform: translateY(11.5px);
+}
+
+.player_waiting_chip:hover
+{
+    border: 1px solid var(--bg-dark);   
+}
+
+#waiting_screen
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+    padding: 12px;
+
+    z-index: 6;
+
+    width: 44%;
+}
+
+#waiting_screen_removed
+{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    background-color: var(--bg-color);
+    border: 3px solid var(--bg-dark);
+    border-radius: 5px;
+    padding: 12px;
+
+    z-index: 6;
+
+    animation-name: remove_waiting_screen;
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+@keyframes remove_waiting_screen {
+    from { transform: scale(1) translate(-50%, -50%); }
+    to { transform: scale(0) translate(-500%, -500%); }
+}
+
+.player_cards_display>img
+{
+    transition-duration: 0.3s;
+}
+
+.player_cards_display>img:hover
+{
+    transform: translateY(-8px);
+}
+
+@keyframes fade_in_text {
+    from { color: #DDDDDD00; }
+    to { color: #DDDDDDFF; }
+}
+
+@keyframes fade_out_text {
+    to { color: #DDDDDD00; }
+    from { color: #DDDDDDFF; }
+}
+
+
+.move_fun_text
+{
+    animation-name: fade_in_text;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+}
+
+.remove_lft
+{
+    animation-name: fade_out_text;
+    animation-duration: 0.25s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes Win_Text_Animation {
+    0% { transform: translate(-50%, -50%) scale(0); color: #ffd70055; }
+    25% { transform: translate(-50%, -50%) scale(5); color: #ffd700; }
+    75% { transform: translate(-50%, -50%) scale(5); color: #ffd700; }
+    100% { transform: translate(-50%, -50%) scale(0); color: #ffd70055; }
+}
+
+.win_text
+{
+    z-index: 10;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(5);
+
+    color: #ffd700;
+
+    animation-name: Win_Text_Animation;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes flash_spectator_text {
+    0%{color: #DDDDDD;}
+    50%{color: #DDDDDD00;}
+    100%{color: #DDDDDD;}
+}
+
+#spectator_text
+{
+    position: fixed;
+    right: 24px;
+    bottom: 7px;
+
+    z-index: 12;
+
+    animation-name: flash_spectator_text;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+#timer_countdown
+{
+    width: 100%;
+    height: 10px;
+    position: fixed;
+    top: 42px;
+
+    background-color: rgba(255, 255, 0, 0.575);
+
+    transition-duration: 1s;
+
+    z-index: 3;
+}
