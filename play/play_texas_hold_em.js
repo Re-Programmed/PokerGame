@@ -790,6 +790,26 @@ var pthe_0x155_p_sC = false;var pthe_0x155_p_IHSC = false;var pthe_0x155_p_ICRW 
     {
         pthe_0x155_p_sC = true;    }
 
+    
+    var previous_entries = []
+    var ival = 0, ivals = [];
+    for(var st_f in pthe_0x155_GD.Folded)
+    {
+        if(previous_entries.includes(st_f))
+        {
+            ivals.push(ival)
+        }else{
+            previous_entries.push(st_f)
+        }
+
+        ival++;
+    }
+
+    for(var i in ivals)
+    {
+        pthe_0x155_GD.Folded.splice(i, 1)
+    }
+
     var st_aF = false;    if(pthe_0x155_GD.Folded.length >= pthe_0x155_GD.players.length - 1 && !pthe_0x155_GD.Folded.includes(pthe_0x155_U.username))
     {
         if(!pthe_0x155_p_ICRW)
