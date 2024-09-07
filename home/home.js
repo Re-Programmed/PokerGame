@@ -157,7 +157,7 @@ const NAME_CustomizeOptions = {
         Query: "#customize_bg_color>input",
         Field: "BGColor",
         Name: "Background Color",
-        Cost: 1000,
+        Cost: 500,
         Init: function(custom)
         {
             NAME_CustomizeOptions_genericINIT(custom, NAME_CustomizeOptions.BackgroundColor, function (value) {
@@ -182,7 +182,7 @@ const NAME_CustomizeOptions = {
         Query: "#customize_name_color>input",
         Field: "NameColor",
         Name: "Name Color",
-        Cost: 2000,
+        Cost: 1000,
         Init: function (custom)
         {
             NAME_CustomizeOptions_genericINIT(custom, NAME_CustomizeOptions.NameColor, function (value) {
@@ -206,7 +206,7 @@ const NAME_CustomizeOptions = {
         Query: "#customize_font>select",
         Field: "Font",
         Name: "Font",
-        Cost: 3000,
+        Cost: 1500,
         Init: function (custom)
         {
             NAME_CustomizeOptions_genericINIT(custom, NAME_CustomizeOptions.Font, function (value) {
@@ -231,7 +231,7 @@ const NAME_CustomizeOptions = {
         Query: "#customize_border>select",
         Field: "Border",
         Name: "Border",
-        Cost: 5000,
+        Cost: 1000,
         Init: function (custom)
         {
             NAME_CustomizeOptions_genericINIT(custom, NAME_CustomizeOptions.Border, function (value) {
@@ -255,7 +255,7 @@ const NAME_CustomizeOptions = {
         Query: "#customize_theme>select",
         Field: "Theme",
         Name: "Theme",
-        Cost: 7500,
+        Cost: 2000,
         Init: function (custom)
         {
             NAME_CustomizeOptions_genericINIT(custom, NAME_CustomizeOptions.Theme, function (value) {
